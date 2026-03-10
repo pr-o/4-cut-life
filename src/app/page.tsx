@@ -1,5 +1,6 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { DEFAULT_STRIP_CONFIG } from "@/lib/constants";
 
 const EXAMPLE_STRIPS = [
   {
@@ -26,21 +27,25 @@ const EXAMPLE_STRIPS = [
     rows: 3,
     colors: ["#fde68a", "#fcd34d", "#fbbf24", "#fed7aa", "#fdba74", "#fb923c"],
   },
-]
+];
 
 function ExampleStrip({
   cols,
   rows,
   colors,
 }: {
-  cols: number
-  rows: number
-  colors: string[]
+  cols: number;
+  rows: number;
+  colors: string[];
 }) {
   return (
     <div
       className="shrink-0 rounded-sm shadow-md"
-      style={{ backgroundColor: "#ffffff", padding: 8, display: "inline-block" }}
+      style={{
+        backgroundColor: DEFAULT_STRIP_CONFIG.frameColor,
+        padding: 8,
+        display: "inline-block",
+      }}
     >
       <div
         style={{
@@ -53,12 +58,16 @@ function ExampleStrip({
         {colors.map((color, i) => (
           <div
             key={i}
-            style={{ backgroundColor: color, aspectRatio: "1 / 1", borderRadius: 2 }}
+            style={{
+              backgroundColor: color,
+              aspectRatio: "1 / 1",
+              borderRadius: 2,
+            }}
           />
         ))}
       </div>
     </div>
-  )
+  );
 }
 
 export default function LandingPage() {
@@ -87,5 +96,5 @@ export default function LandingPage() {
         <Link href="/layout-select">Start</Link>
       </Button>
     </main>
-  )
+  );
 }

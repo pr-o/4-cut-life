@@ -1,21 +1,29 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { Camera, ImageUp } from "lucide-react";
 import NavigationGuard from "@/components/NavigationGuard";
 import { usePhotoStore } from "@/store/usePhotoStore";
 import type { ShootingMode } from "@/store/usePhotoStore";
 import { cn } from "@/lib/utils";
 
-const MODES: { mode: ShootingMode; label: string; description: string }[] = [
+const MODES: {
+  mode: ShootingMode;
+  label: string;
+  description: string;
+  icon: React.ReactNode;
+}[] = [
   {
     mode: "camera",
     label: "Take photos",
     description: "Use your camera to shoot photos with a countdown timer.",
+    icon: <Camera size={32} strokeWidth={1.5} />,
   },
   {
     mode: "upload",
     label: "Upload photos",
     description: "Pick existing photos from your device.",
+    icon: <ImageUp size={32} strokeWidth={1.5} />,
   },
 ];
 
@@ -47,7 +55,7 @@ function ModeSelectContent() {
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
-        {MODES.map(({ mode, label, description }) => (
+        {MODES.map(({ mode, label, description, icon }) => (
           <button
             key={mode}
             onClick={() => handleSelect(mode)}
@@ -56,6 +64,7 @@ function ModeSelectContent() {
               "hover:border-primary hover:bg-primary/5 transition-colors text-center",
             )}
           >
+            <span className="text-muted-foreground">{icon}</span>
             <span className="text-lg font-semibold">{label}</span>
             <span className="text-sm text-muted-foreground">{description}</span>
           </button>

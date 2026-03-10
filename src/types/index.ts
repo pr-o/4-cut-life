@@ -37,6 +37,7 @@ export type StripConfig = {
   frameWidth: number;
   gapX: number;
   gapY: number;
+  photoWidth: number | null; // null = use layout default
   filter: FilterId;
   stickers: Sticker[];
   showTimestamp: boolean;

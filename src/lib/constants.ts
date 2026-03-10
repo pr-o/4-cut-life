@@ -26,7 +26,7 @@ export const FILTER_CSS: Record<FilterId, string> = {
 
 export const FILTER_LABELS: Record<FilterId, string> = {
   none: "No Filter",
-  bw: "Black & White",
+  bw: "B&W",
   sepia: "Sepia",
   vintage: "Vintage",
   soft: "Soft",
@@ -45,10 +45,11 @@ export const STICKER_TYPES: StickerType[] = [
 ];
 
 export const DEFAULT_STRIP_CONFIG = {
-  frameColor: "#ffffff",
+  frameColor: "#000000",
   frameWidth: 12,
   gapX: 4,
   gapY: 4,
+  photoWidth: null,
   filter: "none" as FilterId,
   stickers: [],
   showTimestamp: false,

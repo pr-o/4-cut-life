@@ -35,6 +35,7 @@ interface PhotoStore {
   setFrameWidth: (width: number) => void;
   setGapX: (gap: number) => void;
   setGapY: (gap: number) => void;
+  setPhotoWidth: (width: number | null) => void;
   setFilter: (filter: FilterId) => void;
   addSticker: (sticker: Sticker) => void;
   updateSticker: (id: string, patch: Partial<Sticker>) => void;
@@ -77,6 +78,8 @@ export const usePhotoStore = create<PhotoStore>((set) => ({
     set((s) => ({ stripConfig: { ...s.stripConfig, frameWidth } })),
   setGapX: (gapX) => set((s) => ({ stripConfig: { ...s.stripConfig, gapX } })),
   setGapY: (gapY) => set((s) => ({ stripConfig: { ...s.stripConfig, gapY } })),
+  setPhotoWidth: (photoWidth) =>
+    set((s) => ({ stripConfig: { ...s.stripConfig, photoWidth } })),
   setFilter: (filter) =>
     set((s) => ({ stripConfig: { ...s.stripConfig, filter } })),
   addSticker: (sticker) =>

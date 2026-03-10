@@ -15,6 +15,7 @@ import {
 import NavigationGuard from "@/components/NavigationGuard";
 import PhotoStrip from "@/components/PhotoStrip";
 import { usePhotoStore } from "@/store/usePhotoStore";
+import { BlockPicker } from "react-color";
 import { FILTER_CSS, FILTER_LABELS, STICKER_TYPES } from "@/lib/constants";
 import { STICKER_COMPONENTS } from "@/components/stickers";
 import { exportStripPng, downloadDataUrl } from "@/lib/export/toPng";
@@ -25,14 +26,18 @@ import type { FilterId, StickerType } from "@/types";
 import { cn } from "@/lib/utils";
 
 const FRAME_COLORS = [
-  "#ffffff",
   "#000000",
-  "#fdf2f8",
-  "#fff7ed",
-  "#f0fdf4",
-  "#eff6ff",
-  "#faf5ff",
-  "#fefce8",
+  "#ffffff",
+  "#f9a8d4",
+  "#fde68a",
+  "#bbf7d0",
+  "#bfdbfe",
+  "#ddd6fe",
+  "#fed7aa",
+  "#fecdd3",
+  "#e0f2fe",
+  "#ccfbf1",
+  "#d9f99d",
 ];
 
 function EditContent() {
@@ -46,6 +51,7 @@ function EditContent() {
   const setFrameWidth = usePhotoStore((s) => s.setFrameWidth);
   const setGapX = usePhotoStore((s) => s.setGapX);
   const setGapY = usePhotoStore((s) => s.setGapY);
+  const setPhotoWidth = usePhotoStore((s) => s.setPhotoWidth);
   const setFilter = usePhotoStore((s) => s.setFilter);
   const addSticker = usePhotoStore((s) => s.addSticker);
   const removeSticker = usePhotoStore((s) => s.removeSticker);
@@ -142,9 +148,9 @@ function EditContent() {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col lg:flex-row gap-0 bg-[#eee]">
+      <div className="flex flex-1 flex-col lg:flex-row gap-0 ">
         {/* Left — strip preview */}
-        <div className="flex-1 flex items-start justify-center p-8 bg-muted/30">
+        <div className="flex-1 flex items-start justify-center p-8 bg-[#eee]">
           <PhotoStrip
             photos={selectedPhotos}
             layout={layout}
@@ -156,34 +162,60 @@ function EditContent() {
 
         {/* Right — controls */}
         <aside className="w-full lg:w-80 border-l border-[#bbb] overflow-y-auto p-6 space-y-8">
+          {/* Reset controls */}
+          <div className="flex justify-center">
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-xs"
+              onClick={() => {
+                setFrameColor("#000000");
+                setFrameWidth(12);
+                setGapX(4);
+                setGapY(4);
+                setPhotoWidth(null);
+                setFilter("none");
+                config.stickers.forEach((s) => removeSticker(s.id));
+                setTimestamp(false, "");
+              }}
+            >
+              Reset to defaults
+            </Button>
+          </div>
+
           {/* Frame color */}
           <section className="space-y-3">
             <Label className="text-xs uppercase tracking-wider text-muted-foreground">
               Frame color
             </Label>
-            <div className="flex flex-wrap gap-2">
-              {FRAME_COLORS.map((color) => (
-                <button
-                  key={color}
-                  onClick={() => setFrameColor(color)}
-                  className={cn(
-                    "w-7 h-7 rounded-full border-2 transition-transform",
-                    config.frameColor === color
-                      ? "border-primary scale-110"
-                      : "border-border hover:scale-105",
-                  )}
-                  style={{ backgroundColor: color }}
-                />
-              ))}
-              {/* Custom color */}
-              <input
-                type="color"
-                value={config.frameColor}
-                onChange={(e) => setFrameColor(e.target.value)}
-                className="w-7 h-7 rounded-full border-2 border-border cursor-pointer p-0 overflow-hidden"
-                title="Custom color"
-              />
+            <BlockPicker
+              triangle={"hide"}
+              width="100%"
+              color={config.frameColor}
+              colors={FRAME_COLORS}
+              onChange={(c) => setFrameColor(c.hex)}
+            />
+          </section>
+
+          {/* Photo width */}
+          <section className="space-y-3">
+            <div className="flex justify-between items-center">
+              <Label className="text-xs uppercase tracking-wider text-muted-foreground">
+                Photo width
+              </Label>
+              <span className="text-xs text-muted-foreground">
+                {config.photoWidth ?? layout?.width}px
+              </span>
             </div>
+            <Slider
+              min={layout?.width}
+              max={layout?.height}
+              step={1}
+              value={[config.photoWidth ?? layout?.width]}
+              onValueChange={([v]) =>
+                setPhotoWidth(v === layout?.width ? null : v)
+              }
+            />
           </section>
 
           {/* Frame width */}
@@ -247,7 +279,7 @@ function EditContent() {
             <Label className="text-xs uppercase tracking-wider text-muted-foreground">
               Filter
             </Label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               {(Object.keys(FILTER_LABELS) as FilterId[]).map((id) => (
                 <button
                   key={id}

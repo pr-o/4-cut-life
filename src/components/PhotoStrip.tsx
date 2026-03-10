@@ -19,18 +19,20 @@ export default function PhotoStrip({
   stripRef,
   className,
 }: Props) {
-  const { cols, rows, width: photoWidth, height: photoHeight } = layout;
+  const { cols, rows, width: layoutWidth, height: photoHeight } = layout;
   const {
     frameColor,
     frameWidth,
     gapX,
     gapY,
+    photoWidth: photoWidthOverride,
     filter,
     stickers,
     showTimestamp,
     timestampText,
   } = config;
 
+  const photoWidth = photoWidthOverride ?? layoutWidth;
   const cssFilter = FILTER_CSS[filter];
 
   return (
@@ -71,13 +73,13 @@ export default function PhotoStrip({
       </div>
 
       {/* App title */}
-      <div className="pt-1 text-center font-mono text-xs font-medium invert-50">
+      <div className="pt-1 text-center text-[10px] font-medium invert-50">
         {APP_TITLE}
       </div>
 
       {/* Timestamp */}
       {showTimestamp && (
-        <div className="pt-1 text-center font-mono text-xs invert-50 tracking-wider">
+        <div className="pt-0.5 text-center text-[10px] invert-50 tracking-wide">
           {timestampText}
         </div>
       )}
