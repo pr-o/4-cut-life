@@ -1,65 +1,91 @@
-import Image from "next/image";
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
 
-export default function Home() {
+const EXAMPLE_STRIPS = [
+  {
+    id: 1,
+    cols: 1,
+    rows: 4,
+    colors: ["#f9a8d4", "#fbcfe8", "#fce7f3", "#fdf2f8"],
+  },
+  {
+    id: 2,
+    cols: 2,
+    rows: 2,
+    colors: ["#bfdbfe", "#93c5fd", "#ddd6fe", "#c4b5fd"],
+  },
+  {
+    id: 3,
+    cols: 1,
+    rows: 3,
+    colors: ["#bbf7d0", "#86efac", "#4ade80"],
+  },
+  {
+    id: 4,
+    cols: 2,
+    rows: 3,
+    colors: ["#fde68a", "#fcd34d", "#fbbf24", "#fed7aa", "#fdba74", "#fb923c"],
+  },
+]
+
+function ExampleStrip({
+  cols,
+  rows,
+  colors,
+}: {
+  cols: number
+  rows: number
+  colors: string[]
+}) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    <div
+      className="shrink-0 rounded-sm shadow-md"
+      style={{ backgroundColor: "#ffffff", padding: 8, display: "inline-block" }}
+    >
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: `repeat(${cols}, 1fr)`,
+          gap: 4,
+          width: cols === 1 ? 80 : 120,
+        }}
+      >
+        {colors.map((color, i) => (
+          <div
+            key={i}
+            style={{ backgroundColor: color, aspectRatio: "1 / 1", borderRadius: 2 }}
+          />
+        ))}
+      </div>
     </div>
-  );
+  )
+}
+
+export default function LandingPage() {
+  return (
+    <main className="min-h-screen flex flex-col items-center justify-center gap-12 px-6 py-16">
+      {/* Hero */}
+      <div className="text-center space-y-3">
+        <p className="text-sm tracking-widest text-muted-foreground uppercase">
+          인생네컷
+        </p>
+        <h1 className="text-5xl font-bold tracking-tight">4-cut life</h1>
+        <p className="text-muted-foreground max-w-sm mx-auto">
+          Your own photo booth experience — capture, choose, and download your
+          perfect photo strip.
+        </p>
+      </div>
+
+      {/* Example strips gallery */}
+      <div className="flex items-end gap-6 overflow-x-auto px-4 py-4">
+        {EXAMPLE_STRIPS.map((strip) => (
+          <ExampleStrip key={strip.id} {...strip} />
+        ))}
+      </div>
+
+      <Button asChild size="lg" className="px-12 text-base">
+        <Link href="/layout-select">Start</Link>
+      </Button>
+    </main>
+  )
 }
