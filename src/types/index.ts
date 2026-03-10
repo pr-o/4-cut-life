@@ -1,4 +1,9 @@
-export type Layout = { cols: number; rows: number }
+export type Layout = {
+  cols: number;
+  rows: number;
+  width: number; // of each photo
+  height: number; // of each photo
+};
 
 export type FilterId =
   | "none"
@@ -7,7 +12,7 @@ export type FilterId =
   | "vintage"
   | "soft"
   | "noir"
-  | "vivid"
+  | "vivid";
 
 export type StickerType =
   | "star"
@@ -16,24 +21,24 @@ export type StickerType =
   | "crown"
   | "ribbon"
   | "sparkle"
-  | "bow"
+  | "bow";
 
 export type Sticker = {
-  id: string
-  type: StickerType
-  x: number   // % of strip width
-  y: number   // % of strip height
-  scale: number
-  rotate: number
-}
+  id: string;
+  type: StickerType;
+  x: number; // % of strip width
+  y: number; // % of strip height
+  scale: number;
+  rotate: number;
+};
 
 export type StripConfig = {
-  frameColor: string
-  frameWidth: number
-  gapX: number
-  gapY: number
-  filter: FilterId
-  stickers: Sticker[]
-  showTimestamp: boolean
-  timestampText: string
-}
+  frameColor: string;
+  frameWidth: number;
+  gapX: number;
+  gapY: number;
+  filter: FilterId;
+  stickers: Sticker[];
+  showTimestamp: boolean;
+  timestampText: string;
+};

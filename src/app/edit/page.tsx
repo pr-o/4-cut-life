@@ -1,94 +1,105 @@
-"use client"
+"use client";
 
-import { useRef, useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Slider } from "@/components/ui/slider"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import NavigationGuard from "@/components/NavigationGuard"
-import PhotoStrip from "@/components/PhotoStrip"
-import { usePhotoStore } from "@/store/usePhotoStore"
-import { FILTER_CSS, FILTER_LABELS, STICKER_TYPES } from "@/lib/constants"
-import { STICKER_COMPONENTS } from "@/components/stickers"
-import { exportStripPng, downloadDataUrl } from "@/lib/export/toPng"
-import { exportStripGif } from "@/lib/export/toGif"
-import { generateQrForStrip } from "@/lib/export/toQr"
-import { shareStrip } from "@/lib/export/share"
-import type { FilterId, StickerType } from "@/types"
-import { cn } from "@/lib/utils"
+} from "@/components/ui/dialog";
+import NavigationGuard from "@/components/NavigationGuard";
+import PhotoStrip from "@/components/PhotoStrip";
+import { usePhotoStore } from "@/store/usePhotoStore";
+import { FILTER_CSS, FILTER_LABELS, STICKER_TYPES } from "@/lib/constants";
+import { STICKER_COMPONENTS } from "@/components/stickers";
+import { exportStripPng, downloadDataUrl } from "@/lib/export/toPng";
+import { exportStripGif } from "@/lib/export/toGif";
+import { generateQrForStrip } from "@/lib/export/toQr";
+import { shareStrip } from "@/lib/export/share";
+import type { FilterId, StickerType } from "@/types";
+import { cn } from "@/lib/utils";
 
 const FRAME_COLORS = [
-  "#ffffff", "#000000", "#fdf2f8", "#fff7ed",
-  "#f0fdf4", "#eff6ff", "#faf5ff", "#fefce8",
-]
+  "#ffffff",
+  "#000000",
+  "#fdf2f8",
+  "#fff7ed",
+  "#f0fdf4",
+  "#eff6ff",
+  "#faf5ff",
+  "#fefce8",
+];
 
 function EditContent() {
-  const router = useRouter()
-  const stripRef = useRef<HTMLDivElement>(null)
+  const router = useRouter();
+  const stripRef = useRef<HTMLDivElement>(null);
 
-  const layout = usePhotoStore((s) => s.layout)!
-  const selectedPhotos = usePhotoStore((s) => s.selectedPhotos)
-  const config = usePhotoStore((s) => s.stripConfig)
-  const setFrameColor = usePhotoStore((s) => s.setFrameColor)
-  const setFrameWidth = usePhotoStore((s) => s.setFrameWidth)
-  const setGapX = usePhotoStore((s) => s.setGapX)
-  const setGapY = usePhotoStore((s) => s.setGapY)
-  const setFilter = usePhotoStore((s) => s.setFilter)
-  const addSticker = usePhotoStore((s) => s.addSticker)
-  const removeSticker = usePhotoStore((s) => s.removeSticker)
-  const setTimestamp = usePhotoStore((s) => s.setTimestamp)
-  const reset = usePhotoStore((s) => s.reset)
+  const layout = usePhotoStore((s) => s.layout)!;
+  const selectedPhotos = usePhotoStore((s) => s.selectedPhotos);
+  const config = usePhotoStore((s) => s.stripConfig);
+  const setFrameColor = usePhotoStore((s) => s.setFrameColor);
+  const setFrameWidth = usePhotoStore((s) => s.setFrameWidth);
+  const setGapX = usePhotoStore((s) => s.setGapX);
+  const setGapY = usePhotoStore((s) => s.setGapY);
+  const setFilter = usePhotoStore((s) => s.setFilter);
+  const addSticker = usePhotoStore((s) => s.addSticker);
+  const removeSticker = usePhotoStore((s) => s.removeSticker);
+  const setTimestamp = usePhotoStore((s) => s.setTimestamp);
+  const reset = usePhotoStore((s) => s.reset);
 
-  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null)
-  const [qrOpen, setQrOpen] = useState(false)
-  const [gifLoading, setGifLoading] = useState(false)
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
+  const [qrOpen, setQrOpen] = useState(false);
+  const [gifLoading, setGifLoading] = useState(false);
 
   async function getPngDataUrl(): Promise<string> {
-    return exportStripPng(stripRef.current!)
+    return exportStripPng(stripRef.current!);
   }
 
   async function handleDownloadPng() {
-    const dataUrl = await getPngDataUrl()
-    downloadDataUrl(dataUrl, "4-cut-life.png")
+    const dataUrl = await getPngDataUrl();
+    downloadDataUrl(dataUrl, "4-cut-life.png");
   }
 
   async function handleDownloadQr() {
-    const dataUrl = await getPngDataUrl()
-    const qr = await generateQrForStrip(dataUrl, window.location.origin)
-    setQrDataUrl(qr)
-    setQrOpen(true)
+    const dataUrl = await getPngDataUrl();
+    const qr = await generateQrForStrip(dataUrl, window.location.origin);
+    setQrDataUrl(qr);
+    setQrOpen(true);
   }
 
   async function handleShare() {
-    const dataUrl = await getPngDataUrl()
-    await shareStrip(dataUrl)
+    const dataUrl = await getPngDataUrl();
+    await shareStrip(dataUrl);
   }
 
   async function handleDownloadGif() {
-    setGifLoading(true)
+    setGifLoading(true);
     try {
-      const blob = await exportStripGif(selectedPhotos, FILTER_CSS[config.filter])
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement("a")
-      a.href = url
-      a.download = "4-cut-life.gif"
-      a.click()
-      URL.revokeObjectURL(url)
+      const blob = await exportStripGif(
+        selectedPhotos,
+        FILTER_CSS[config.filter],
+      );
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "4-cut-life.gif";
+      a.click();
+      URL.revokeObjectURL(url);
     } finally {
-      setGifLoading(false)
+      setGifLoading(false);
     }
   }
 
   function handleStartAgain() {
-    reset()
-    router.replace("/")
+    router.replace("/layout-select");
+    setTimeout(() => {
+      reset();
+    }, 50);
   }
 
   function handleAddSticker(type: StickerType) {
@@ -99,7 +110,7 @@ function EditContent() {
       y: 10 + Math.random() * 80,
       scale: 1,
       rotate: Math.round(Math.random() * 30 - 15),
-    })
+    });
   }
 
   return (
@@ -108,11 +119,15 @@ function EditContent() {
       <div className="border-b px-6 py-3 flex flex-wrap gap-2 items-center justify-between">
         <h1 className="text-lg font-semibold">Edit your strip</h1>
         <div className="flex flex-wrap gap-2">
-          <Button size="sm" onClick={handleDownloadPng}>Download</Button>
+          <Button size="sm" onClick={handleDownloadPng}>
+            Download
+          </Button>
           <Button size="sm" variant="outline" onClick={handleDownloadQr}>
             Download via QR
           </Button>
-          <Button size="sm" variant="outline" onClick={handleShare}>Share</Button>
+          <Button size="sm" variant="outline" onClick={handleShare}>
+            Share
+          </Button>
           <Button
             size="sm"
             variant="outline"
@@ -127,7 +142,7 @@ function EditContent() {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col lg:flex-row gap-0">
+      <div className="flex flex-1 flex-col lg:flex-row gap-0 bg-[#eee]">
         {/* Left — strip preview */}
         <div className="flex-1 flex items-start justify-center p-8 bg-muted/30">
           <PhotoStrip
@@ -140,8 +155,7 @@ function EditContent() {
         </div>
 
         {/* Right — controls */}
-        <aside className="w-full lg:w-80 border-l overflow-y-auto p-6 space-y-8">
-
+        <aside className="w-full lg:w-80 border-l border-[#bbb] overflow-y-auto p-6 space-y-8">
           {/* Frame color */}
           <section className="space-y-3">
             <Label className="text-xs uppercase tracking-wider text-muted-foreground">
@@ -156,7 +170,7 @@ function EditContent() {
                     "w-7 h-7 rounded-full border-2 transition-transform",
                     config.frameColor === color
                       ? "border-primary scale-110"
-                      : "border-border hover:scale-105"
+                      : "border-border hover:scale-105",
                   )}
                   style={{ backgroundColor: color }}
                 />
@@ -178,10 +192,14 @@ function EditContent() {
               <Label className="text-xs uppercase tracking-wider text-muted-foreground">
                 Frame width
               </Label>
-              <span className="text-xs text-muted-foreground">{config.frameWidth}px</span>
+              <span className="text-xs text-muted-foreground">
+                {config.frameWidth}px
+              </span>
             </div>
             <Slider
-              min={0} max={40} step={2}
+              min={0}
+              max={40}
+              step={2}
               value={[config.frameWidth]}
               onValueChange={([v]) => setFrameWidth(v)}
             />
@@ -194,20 +212,30 @@ function EditContent() {
             </Label>
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <span className="text-xs text-muted-foreground">Horizontal</span>
-                <span className="text-xs text-muted-foreground">{config.gapX}px</span>
+                <span className="text-xs text-muted-foreground">
+                  Horizontal
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  {config.gapX}px
+                </span>
               </div>
               <Slider
-                min={0} max={24} step={1}
+                min={0}
+                max={24}
+                step={1}
                 value={[config.gapX]}
                 onValueChange={([v]) => setGapX(v)}
               />
               <div className="flex justify-between items-center mt-2">
                 <span className="text-xs text-muted-foreground">Vertical</span>
-                <span className="text-xs text-muted-foreground">{config.gapY}px</span>
+                <span className="text-xs text-muted-foreground">
+                  {config.gapY}px
+                </span>
               </div>
               <Slider
-                min={0} max={24} step={1}
+                min={0}
+                max={24}
+                step={1}
                 value={[config.gapY]}
                 onValueChange={([v]) => setGapY(v)}
               />
@@ -228,7 +256,7 @@ function EditContent() {
                     "text-xs px-3 py-2 rounded-lg border transition-colors",
                     config.filter === id
                       ? "border-primary bg-primary/5 font-medium"
-                      : "border-border hover:border-primary/40"
+                      : "border-border hover:border-primary/40",
                   )}
                 >
                   {FILTER_LABELS[id]}
@@ -244,7 +272,7 @@ function EditContent() {
             </Label>
             <div className="flex flex-wrap gap-2">
               {STICKER_TYPES.map((type) => {
-                const Icon = STICKER_COMPONENTS[type]
+                const Icon = STICKER_COMPONENTS[type];
                 return (
                   <button
                     key={type}
@@ -254,13 +282,13 @@ function EditContent() {
                   >
                     <Icon size={24} />
                   </button>
-                )
+                );
               })}
             </div>
             {config.stickers.length > 0 && (
               <div className="space-y-1">
                 {config.stickers.map((sticker) => {
-                  const Icon = STICKER_COMPONENTS[sticker.type]
+                  const Icon = STICKER_COMPONENTS[sticker.type];
                   return (
                     <div
                       key={sticker.id}
@@ -277,7 +305,7 @@ function EditContent() {
                         Remove
                       </button>
                     </div>
-                  )
+                  );
                 })}
               </div>
             )}
@@ -290,16 +318,30 @@ function EditContent() {
                 Timestamp
               </Label>
               <button
-                onClick={() => setTimestamp(!config.showTimestamp)}
+                onClick={() => {
+                  const turningOn = !config.showTimestamp;
+                  const text =
+                    turningOn && !config.timestampText
+                      ? new Date()
+                          .toLocaleDateString("ko-KR", {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                          })
+                          .replace(/\. /g, ".")
+                          .replace(/\.$/, "")
+                      : config.timestampText;
+                  setTimestamp(turningOn, text);
+                }}
                 className={cn(
                   "relative inline-flex h-5 w-9 items-center rounded-full transition-colors",
-                  config.showTimestamp ? "bg-primary" : "bg-muted"
+                  config.showTimestamp ? "bg-primary" : "bg-muted",
                 )}
               >
                 <span
                   className={cn(
                     "inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform",
-                    config.showTimestamp ? "translate-x-4" : "translate-x-1"
+                    config.showTimestamp ? "translate-x-4" : "translate-x-1",
                   )}
                 />
               </button>
@@ -332,21 +374,21 @@ function EditContent() {
         </DialogContent>
       </Dialog>
     </main>
-  )
+  );
 }
 
 export default function EditPage() {
-  const layout = usePhotoStore((s) => s.layout)
-  const selectedPhotos = usePhotoStore((s) => s.selectedPhotos)
+  const layout = usePhotoStore((s) => s.layout);
+  const selectedPhotos = usePhotoStore((s) => s.selectedPhotos);
   return (
     <NavigationGuard
       check={() => {
-        if (!layout) return "/layout-select"
-        if (selectedPhotos.length === 0) return "/select"
-        return null
+        if (!layout) return "/layout-select";
+        if (selectedPhotos.length === 0) return "/select";
+        return null;
       }}
     >
       <EditContent />
     </NavigationGuard>
-  )
+  );
 }

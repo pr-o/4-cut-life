@@ -90,11 +90,13 @@ function SelectContent() {
 
 export default function SelectPage() {
   const layout = usePhotoStore((s) => s.layout)
+  const shootingMode = usePhotoStore((s) => s.shootingMode)
   const capturedPhotos = usePhotoStore((s) => s.capturedPhotos)
   return (
     <NavigationGuard
       check={() => {
         if (!layout) return "/layout-select"
+        if (shootingMode === "upload") return "/upload"
         if (capturedPhotos.length === 0) return "/capture"
         return null
       }}
