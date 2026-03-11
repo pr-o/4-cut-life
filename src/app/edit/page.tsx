@@ -16,7 +16,16 @@ import NavigationGuard from "@/components/NavigationGuard";
 import PhotoStrip from "@/components/PhotoStrip";
 import { usePhotoStore } from "@/store/usePhotoStore";
 import { BlockPicker } from "react-color";
-import { FILTER_CSS, FILTER_LABELS, STICKER_TYPES } from "@/lib/constants";
+import {
+  DEFAULT_STRIP_CONFIG,
+  FILTER_CSS,
+  FILTER_LABELS,
+  FRAME_WIDTH_MIN,
+  FRAME_WIDTH_MAX,
+  GAP_MIN,
+  GAP_MAX,
+  STICKER_TYPES,
+} from "@/lib/constants";
 import { STICKER_COMPONENTS } from "@/components/stickers";
 import { exportStripPng, downloadDataUrl } from "@/lib/export/toPng";
 import { exportStripGif } from "@/lib/export/toGif";
@@ -169,8 +178,8 @@ function EditContent() {
               variant="outline"
               className="text-xs"
               onClick={() => {
-                setFrameColor("#000000");
-                setFrameWidth(12);
+                setFrameColor(DEFAULT_STRIP_CONFIG.frameColor);
+                setFrameWidth(DEFAULT_STRIP_CONFIG.frameWidth);
                 setGapX(4);
                 setGapY(4);
                 setPhotoWidth(null);
@@ -229,8 +238,8 @@ function EditContent() {
               </span>
             </div>
             <Slider
-              min={0}
-              max={40}
+              min={FRAME_WIDTH_MIN}
+              max={FRAME_WIDTH_MAX}
               step={2}
               value={[config.frameWidth]}
               onValueChange={([v]) => setFrameWidth(v)}
@@ -252,8 +261,8 @@ function EditContent() {
                 </span>
               </div>
               <Slider
-                min={0}
-                max={24}
+                min={GAP_MIN}
+                max={GAP_MAX}
                 step={1}
                 value={[config.gapX]}
                 onValueChange={([v]) => setGapX(v)}
@@ -265,8 +274,8 @@ function EditContent() {
                 </span>
               </div>
               <Slider
-                min={0}
-                max={24}
+                min={GAP_MIN}
+                max={GAP_MAX}
                 step={1}
                 value={[config.gapY]}
                 onValueChange={([v]) => setGapY(v)}
