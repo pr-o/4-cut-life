@@ -46,6 +46,11 @@ export default function PhotoStrip({
         position: "relative",
       }}
     >
+      {/* App title */}
+      <div className="pb-1 text-right absolute top-0.5 right-1 text-[10px] font-semibold invert-50">
+        {APP_TITLE}
+      </div>
+
       {/* Photo grid */}
       <div
         style={{
@@ -70,11 +75,6 @@ export default function PhotoStrip({
             }}
           />
         ))}
-      </div>
-
-      {/* App title */}
-      <div className="pt-1 text-center text-[10px] font-medium invert-50">
-        {APP_TITLE}
       </div>
 
       {/* Timestamp */}
