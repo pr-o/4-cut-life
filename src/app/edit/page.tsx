@@ -254,12 +254,21 @@ function EditContent() {
         selectedPhotos,
         FILTER_CSS[config.filter],
       );
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "4-cut-life.gif";
-      a.click();
-      URL.revokeObjectURL(url);
+      const filename = "4-cut-life.gif";
+      const file = new File([blob], filename, { type: "image/gif" });
+
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], title: filename });
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 100);
+      }
     } finally {
       setGifLoading(false);
     }
