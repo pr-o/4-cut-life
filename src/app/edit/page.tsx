@@ -76,6 +76,10 @@ function EditContent() {
 
   const [activeStickerType, setActiveStickerType] =
     useState<StickerType | null>(null);
+  const [zoom, setZoom] = useState(1);
+  const ZOOM_STEP = 0.25;
+  const ZOOM_MIN = 1 / 3;
+  const ZOOM_MAX = 3;
 
   // Keep stickers visually anchored when dimensions change.
   // Grid expands symmetrically from center, so shift by half the total expansion.
@@ -256,13 +260,15 @@ function EditContent() {
 
       <div className="flex flex-1 flex-col lg:flex-row gap-0">
         {/* Left — strip preview */}
-        <div className="flex-1 flex items-start justify-center p-8 bg-[#eee]">
+        <div className="flex-1 flex items-start justify-center p-8 bg-[#eee] relative overflow-auto">
           <div
             ref={stripWrapperRef}
             onClick={handleStripClick}
             style={{
               position: "relative",
               cursor: activeStickerType ? "none" : "default",
+              transform: `scale(${zoom})`,
+              transformOrigin: "top center",
             }}
           >
             <PhotoStrip
@@ -280,6 +286,30 @@ function EditContent() {
               onMove={(id, x, y) => updateSticker(id, { x, y })}
               onResize={(id, scale) => updateSticker(id, { scale })}
             />
+          </div>
+
+          {/* Floating zoom controls */}
+          <div className="absolute top-4 right-4 flex items-center gap-1 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 shadow-md">
+            <button
+              onClick={() => setZoom((z) => Math.max(ZOOM_MIN, +(z - ZOOM_STEP).toFixed(2)))}
+              disabled={zoom <= ZOOM_MIN}
+              className="w-7 h-7 rounded-full flex items-center justify-center text-sm font-medium hover:bg-black/5 disabled:opacity-30 transition-colors"
+            >
+              −
+            </button>
+            <button
+              onClick={() => setZoom(1)}
+              className="min-w-[3rem] text-center text-xs font-medium px-1 hover:bg-black/5 rounded-full py-0.5 transition-colors"
+            >
+              {Math.round(zoom * 100)}%
+            </button>
+            <button
+              onClick={() => setZoom((z) => Math.min(ZOOM_MAX, +(z + ZOOM_STEP).toFixed(2)))}
+              disabled={zoom >= ZOOM_MAX}
+              className="w-7 h-7 rounded-full flex items-center justify-center text-sm font-medium hover:bg-black/5 disabled:opacity-30 transition-colors"
+            >
+              +
+            </button>
           </div>
         </div>
 
