@@ -19,6 +19,7 @@ function CameraCapture() {
   const countdownSeconds = usePhotoStore((s) => s.countdownSeconds);
   const photoCount = usePhotoStore((s) => s.photoCount);
   const setCapturedPhotos = usePhotoStore((s) => s.setCapturedPhotos);
+  const setSelectedPhotos = usePhotoStore((s) => s.setSelectedPhotos);
 
   const slotCount = layout.cols * layout.rows;
   const totalShots = photoCount ?? slotCount;
@@ -95,7 +96,8 @@ function CameraCapture() {
 
   function handleContinue() {
     setCapturedPhotos(photos);
-    router.push("/select");
+    setSelectedPhotos(photos.slice(0, slotCount));
+    router.push("/edit");
   }
 
   return (

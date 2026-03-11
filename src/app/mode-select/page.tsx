@@ -56,8 +56,6 @@ function ModeSelectContent() {
         </h1>
       </div>
 
-      <GoBackButton href={ROUTES.layoutSelect} />
-
       <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
         {MODES.map(({ mode, label, description, icon }) => (
           <button
@@ -74,6 +72,8 @@ function ModeSelectContent() {
           </button>
         ))}
       </div>
+
+      <GoBackButton href={ROUTES.layoutSelect} />
     </main>
   );
 }

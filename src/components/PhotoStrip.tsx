@@ -47,7 +47,7 @@ export default function PhotoStrip({
       }}
     >
       {/* App title */}
-      <div className="pb-0.5 text-center text-[10px] font-medium invert-50">
+      <div className="pb-1 text-center text-[10px] font-medium invert-50">
         {APP_TITLE}
       </div>
 
@@ -60,27 +60,38 @@ export default function PhotoStrip({
           gap: `${gapY}px ${gapX}px`,
         }}
       >
-        {photos.map((src, i) => (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            key={i}
-            src={src}
-            alt={`Photo ${i + 1}`}
-            draggable="false"
-            style={{
-              display: "block",
-              objectFit: "cover",
-              width: photoWidth,
-              height: photoHeight,
-              filter: cssFilter,
-            }}
-          />
-        ))}
+        {photos.map((src, i) =>
+          src ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              key={i}
+              src={src}
+              alt={`Photo ${i + 1}`}
+              draggable="false"
+              style={{
+                display: "block",
+                objectFit: "cover",
+                width: photoWidth,
+                height: photoHeight,
+                filter: cssFilter,
+              }}
+            />
+          ) : (
+            <div
+              key={i}
+              style={{
+                width: photoWidth,
+                height: photoHeight,
+                backgroundColor: "#d1d5db",
+              }}
+            />
+          ),
+        )}
       </div>
 
       {/* Timestamp */}
       {showTimestamp && (
-        <div className="pt-0.5 text-center text-[10px] invert-50 tracking-wide">
+        <div className="pt-1 text-center text-[10px] invert-50 tracking-wide">
           {timestampText}
         </div>
       )}

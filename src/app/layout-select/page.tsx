@@ -91,7 +91,6 @@ export default function LayoutSelectPage() {
       </div>
 
       <div className="flex gap-3">
-        <GoBackButton href={ROUTES.landing} />
         <Button
           size="lg"
           className="px-12"
