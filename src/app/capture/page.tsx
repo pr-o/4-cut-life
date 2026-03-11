@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import NavigationGuard from "@/components/NavigationGuard";
 import GoBackButton from "@/components/GoBackButton";
+import PhotoThumbnailGrid from "@/components/PhotoThumbnailGrid";
 import { usePhotoStore } from "@/store/usePhotoStore";
 import { ROUTES } from "@/lib/routes";
 import { toast } from "sonner";
@@ -132,19 +133,7 @@ function CameraCapture() {
         )}
       </div>
 
-      {photos.length > 0 && (
-        <div className="flex flex-wrap gap-2 justify-center max-w-sm">
-          {photos.map((src, i) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              key={i}
-              src={src}
-              alt={`Shot ${i + 1}`}
-              className="w-16 h-16 object-cover rounded-lg border border-border"
-            />
-          ))}
-        </div>
-      )}
+      <PhotoThumbnailGrid photos={photos} total={totalShots} size={64} />
 
       <div className="flex flex-col items-center gap-3 w-full max-w-sm">
         {captureState !== "done" && (
