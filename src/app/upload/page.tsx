@@ -4,7 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import NavigationGuard from "@/components/NavigationGuard";
+import GoBackButton from "@/components/GoBackButton";
 import { usePhotoStore } from "@/store/usePhotoStore";
+import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 
 const CAPTURE_SIZE = 1080;
@@ -105,11 +107,14 @@ function UploadContent() {
         </div>
       )}
 
-      {photos.length >= slotCount && (
-        <Button size="lg" className="px-12" onClick={handleContinue}>
-          Continue
-        </Button>
-      )}
+      <div className="flex gap-3">
+        <GoBackButton href={ROUTES.modeSelect} />
+        {photos.length >= slotCount && (
+          <Button size="lg" className="px-12" onClick={handleContinue}>
+            Continue
+          </Button>
+        )}
+      </div>
     </main>
   );
 }

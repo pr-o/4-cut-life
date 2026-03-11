@@ -3,7 +3,9 @@
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import NavigationGuard from "@/components/NavigationGuard";
+import GoBackButton from "@/components/GoBackButton";
 import { usePhotoStore } from "@/store/usePhotoStore";
+import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 
 const COUNTDOWN_OPTIONS = [1, 2, 3, 5, 10];
@@ -88,9 +90,12 @@ function InstructionsContent() {
         </div>
       </div>
 
-      <Button size="lg" className="px-12" onClick={() => router.push("/capture")}>
-        Continue
-      </Button>
+      <div className="flex gap-3">
+        <GoBackButton href={ROUTES.modeSelect} />
+        <Button size="lg" className="px-12" onClick={() => router.push("/capture")}>
+          Continue
+        </Button>
+      </div>
     </main>
   );
 }

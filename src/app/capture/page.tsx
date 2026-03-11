@@ -4,7 +4,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import NavigationGuard from "@/components/NavigationGuard";
+import GoBackButton from "@/components/GoBackButton";
 import { usePhotoStore } from "@/store/usePhotoStore";
+import { ROUTES } from "@/lib/routes";
 import { toast } from "sonner";
 
 type CaptureState = "idle" | "countdown" | "flash" | "done";
@@ -155,14 +157,7 @@ function CameraCapture() {
         )}
         {captureState === "done" && (
           <div className="flex gap-3 w-full">
-            <Button
-              size="lg"
-              variant="outline"
-              className="flex-1"
-              onClick={() => router.push("/instructions")}
-            >
-              Go back
-            </Button>
+            <div className="flex-1"><GoBackButton href={ROUTES.instructions} /></div>
             <Button size="lg" className="flex-1" onClick={handleContinue}>
               Continue
             </Button>

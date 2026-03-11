@@ -3,7 +3,9 @@
 import { useRouter } from "next/navigation";
 import { Camera, ImageUp } from "lucide-react";
 import NavigationGuard from "@/components/NavigationGuard";
+import GoBackButton from "@/components/GoBackButton";
 import { usePhotoStore } from "@/store/usePhotoStore";
+import { ROUTES } from "@/lib/routes";
 import type { ShootingMode } from "@/store/usePhotoStore";
 import { cn } from "@/lib/utils";
 
@@ -53,6 +55,8 @@ function ModeSelectContent() {
           How would you like to add photos?
         </h1>
       </div>
+
+      <GoBackButton href={ROUTES.layoutSelect} />
 
       <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
         {MODES.map(({ mode, label, description, icon }) => (
