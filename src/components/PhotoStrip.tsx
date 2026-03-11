@@ -66,6 +66,7 @@ export default function PhotoStrip({
             key={i}
             src={src}
             alt={`Photo ${i + 1}`}
+            draggable="false"
             style={{
               display: "block",
               objectFit: "cover",
@@ -84,7 +85,7 @@ export default function PhotoStrip({
         </div>
       )}
 
-      {/* Stickers — positioned relative to the whole strip */}
+      {/* Stickers — anchored to photo grid origin, unaffected by frame/timestamp changes */}
       {stickers.map((sticker) => {
         const StickerComponent = STICKER_COMPONENTS[sticker.type];
         return (
@@ -92,8 +93,8 @@ export default function PhotoStrip({
             key={sticker.id}
             style={{
               position: "absolute",
-              left: `${sticker.x}%`,
-              top: `${sticker.y}%`,
+              left: frameWidth + sticker.x,
+              top: frameWidth + sticker.y,
               transform: `translate(-50%, -50%) scale(${sticker.scale}) rotate(${sticker.rotate}deg)`,
               pointerEvents: "none",
               lineHeight: 0,

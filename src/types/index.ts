@@ -19,15 +19,13 @@ export type StickerType =
   | "heart"
   | "flower"
   | "crown"
-  | "ribbon"
-  | "sparkle"
-  | "bow";
+  | "sparkle";
 
 export type Sticker = {
   id: string;
   type: StickerType;
-  x: number; // % of strip width
-  y: number; // % of strip height
+  x: number; // px from left edge of photo grid (excludes frame padding)
+  y: number; // px from top edge of photo grid (excludes frame padding)
   scale: number;
   rotate: number;
 };
