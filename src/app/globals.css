@@ -131,18 +131,19 @@
     box-shadow: none !important;
     border-width: 0 1px 1px 1px !important;
 
-    div:nth-child(2) {
-      height: 60px !important;
-    }
-
-    div:nth-child(3) {
-      border-top: 1px solid var(--border) !important;
-      height: 110px !important;
-    }
-
     span > div {
       border: 1px solid var(--border) !important;
       border-radius: 4px !important;
     }
+  }
+
+  .block-picker > div:nth-child(2) {
+    border-top: 1px solid var(--border) !important;
+    height: 60px !important;
+  }
+
+  .block-picker > div:nth-child(3) {
+    border-top: 1px solid var(--border) !important;
+    height: 110px !important;
   }
 }
