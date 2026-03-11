@@ -197,7 +197,12 @@ function EditContent() {
   }
 
   async function getPngDataUrl(): Promise<string> {
-    return exportStripPng(stripRef.current!);
+    return exportStripPng({
+      element: stripRef.current!,
+      photos: photosForStrip,
+      layout,
+      config,
+    });
   }
 
   async function handleDownloadPng() {
