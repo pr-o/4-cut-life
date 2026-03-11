@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import GoBackButton from "@/components/GoBackButton";
 import { usePhotoStore } from "@/store/usePhotoStore";
+import { ROUTES } from "@/lib/routes";
 import { LAYOUTS } from "@/lib/constants";
 import type { Layout } from "@/types";
 import { cn } from "@/lib/utils";
@@ -88,14 +90,16 @@ export default function LayoutSelectPage() {
         })}
       </div>
 
-      <Button
-        size="lg"
-        className="px-12"
-        disabled={!selected}
-        onClick={handleContinue}
-      >
-        Continue
-      </Button>
+      <div className="flex gap-3">
+        <Button
+          size="lg"
+          className="px-12"
+          disabled={!selected}
+          onClick={handleContinue}
+        >
+          Continue
+        </Button>
+      </div>
     </main>
   );
 }

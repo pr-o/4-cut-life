@@ -116,7 +116,7 @@ export const usePhotoStore = create<PhotoStore>((set) => ({
 
   reset: () =>
     set({
-      layout: null,
+      layout: LAYOUTS[0],
       shootingMode: null,
       countdownSeconds: 3,
       photoCount: null,

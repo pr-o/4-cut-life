@@ -3,7 +3,9 @@
 import { useRouter } from "next/navigation";
 import { Camera, ImageUp } from "lucide-react";
 import NavigationGuard from "@/components/NavigationGuard";
+import GoBackButton from "@/components/GoBackButton";
 import { usePhotoStore } from "@/store/usePhotoStore";
+import { ROUTES } from "@/lib/routes";
 import type { ShootingMode } from "@/store/usePhotoStore";
 import { cn } from "@/lib/utils";
 
@@ -70,6 +72,8 @@ function ModeSelectContent() {
           </button>
         ))}
       </div>
+
+      <GoBackButton href={ROUTES.layoutSelect} />
     </main>
   );
 }
