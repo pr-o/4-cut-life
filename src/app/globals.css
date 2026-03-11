@@ -130,5 +130,14 @@
   .block-picker {
     box-shadow: none !important;
     border-width: 0 1px 1px 1px !important;
+
+    div:nth-child(3) {
+      border-top: 1px solid var(--border) !important;
+    }
+
+    span > div {
+      border: 1px solid var(--border) !important;
+      border-radius: 4px !important;
+    }
   }
 }

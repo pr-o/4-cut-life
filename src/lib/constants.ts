@@ -58,3 +58,8 @@ export const DEFAULT_STRIP_CONFIG = {
 
 export const PREVIEW_WIDTH = 400;
 export const EXPORT_PIXEL_RATIO = 3;
+
+export const FRAME_WIDTH_MIN = 2;
+export const FRAME_WIDTH_MAX = 40;
+export const GAP_MIN = 2;
+export const GAP_MAX = 24;

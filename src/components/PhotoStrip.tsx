@@ -47,7 +47,7 @@ export default function PhotoStrip({
       }}
     >
       {/* App title */}
-      <div className="pb-1 text-right absolute top-0.5 right-1 text-[10px] font-semibold invert-50">
+      <div className="pb-0.5 text-center text-[10px] font-medium invert-50">
         {APP_TITLE}
       </div>
 
