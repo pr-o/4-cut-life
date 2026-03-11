@@ -1,8 +1,16 @@
 import { toPng } from "html-to-image"
 import { EXPORT_PIXEL_RATIO } from "@/lib/constants"
 
+const isIosSafari =
+  typeof navigator !== "undefined" &&
+  /iP(ad|hone|od)/.test(navigator.userAgent) &&
+  /WebKit/.test(navigator.userAgent) &&
+  !/CriOS|FxiOS|OPiOS|mercury/.test(navigator.userAgent)
+
 export async function exportStripPng(element: HTMLElement): Promise<string> {
-  return toPng(element, { pixelRatio: EXPORT_PIXEL_RATIO })
+  const options = { pixelRatio: EXPORT_PIXEL_RATIO }
+  if (isIosSafari) await toPng(element, options) // warm-up call for iOS Safari
+  return toPng(element, options)
 }
 
 export async function downloadDataUrl(dataUrl: string, filename: string) {
