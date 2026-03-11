@@ -257,9 +257,10 @@ function EditContent() {
           <Button size="sm" onClick={handleDownloadPng}>
             Download
           </Button>
+          {/* TODO: re-enable once QR sharing backend is ready
           <Button size="sm" variant="outline" onClick={handleDownloadQr}>
             Download via QR
-          </Button>
+          </Button> */}
           <Button size="sm" variant="outline" onClick={handleShare}>
             Share
           </Button>

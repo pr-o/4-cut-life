@@ -11,15 +11,15 @@ const EXAMPLE_STRIPS = [
   },
   {
     id: 2,
-    cols: 2,
-    rows: 2,
-    colors: ["#bfdbfe", "#93c5fd", "#ddd6fe", "#c4b5fd"],
-  },
-  {
-    id: 3,
     cols: 1,
     rows: 3,
     colors: ["#bbf7d0", "#86efac", "#4ade80"],
+  },
+  {
+    id: 3,
+    cols: 2,
+    rows: 2,
+    colors: ["#bfdbfe", "#93c5fd", "#ddd6fe", "#c4b5fd"],
   },
   {
     id: 4,
