@@ -23,6 +23,12 @@ function CameraCapture() {
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const shutterRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    shutterRef.current = new Audio("/assets/sounds/camera-shutter.wav");
+    shutterRef.current.preload = "auto";
+  }, []);
 
   const [photos, setPhotos] = useState<string[]>([]);
   const [captureState, setCaptureState] = useState<CaptureState>("idle");
@@ -75,6 +81,7 @@ function CameraCapture() {
         await new Promise((r) => setTimeout(r, 1000));
       }
       setCaptureState("flash");
+      shutterRef.current?.play().catch(() => {});
       const dataUrl = captureFrame();
       setPhotos((prev) => [...prev, dataUrl]);
       await new Promise((r) => setTimeout(r, 300));
@@ -106,7 +113,7 @@ function CameraCapture() {
         />
         {captureState === "countdown" && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-white text-8xl font-black drop-shadow-lg">
+            <span className="text-white text-8xl font-black drop-shadow-lg opacity-50">
               {countdown}
             </span>
           </div>
@@ -147,9 +154,19 @@ function CameraCapture() {
           </Button>
         )}
         {captureState === "done" && (
-          <Button size="lg" className="w-full" onClick={handleContinue}>
-            Continue
-          </Button>
+          <div className="flex gap-3 w-full">
+            <Button
+              size="lg"
+              variant="outline"
+              className="flex-1"
+              onClick={() => router.push("/instructions")}
+            >
+              Go back
+            </Button>
+            <Button size="lg" className="flex-1" onClick={handleContinue}>
+              Continue
+            </Button>
+          </div>
         )}
       </div>
     </main>
