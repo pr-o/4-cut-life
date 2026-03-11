@@ -75,10 +75,8 @@ export default function LandingPage() {
     <main className="min-h-screen flex flex-col items-center justify-center gap-12 px-6 py-16">
       {/* Hero */}
       <div className="text-center space-y-3">
-        <p className="text-sm tracking-widest text-muted-foreground uppercase">
-          인생네컷
-        </p>
-        <h1 className="text-5xl font-bold tracking-tight">4-cut life</h1>
+        <p className="text-5xl font-bold tracking-widest uppercase">네컷인생</p>
+        <h1 className="text-5xl font-bold tracking-wide">4-Cut Life</h1>
         <p className="text-muted-foreground max-w-sm mx-auto">
           Your own photo booth experience — capture, choose, and download your
           perfect photo strip.

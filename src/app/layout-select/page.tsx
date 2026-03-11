@@ -80,7 +80,8 @@ export default function LayoutSelectPage() {
                 cols={layout.cols}
                 rows={layout.rows}
                 width={layout.width}
-                height={layout.height}
+                height={layout.width} // square looks prettier
+                // height={layout.height}
               />
               <span className="text-sm font-medium">
                 {layout.cols}×{layout.rows}
