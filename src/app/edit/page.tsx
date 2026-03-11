@@ -83,6 +83,11 @@ function EditContent() {
   const ZOOM_MIN = 1 / 3;
   const ZOOM_MAX = 3;
 
+  // Default to 150% on medium+ screens
+  useEffect(() => {
+    if (window.innerWidth >= 768) setZoom(1.5);
+  }, []);
+
   const required = layout.cols * layout.rows;
 
   // Pad selectedPhotos to always fill all strip slots (empty string = placeholder)

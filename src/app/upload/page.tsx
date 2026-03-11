@@ -5,10 +5,10 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import NavigationGuard from "@/components/NavigationGuard";
 import GoBackButton from "@/components/GoBackButton";
+import PhotoThumbnailGrid from "@/components/PhotoThumbnailGrid";
 import { usePhotoStore } from "@/store/usePhotoStore";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
-
 const CAPTURE_SIZE = 1080;
 
 function resizeToDataUrl(file: File): Promise<string> {
@@ -93,19 +93,11 @@ function UploadContent() {
 
       {error && <p className="text-sm text-destructive">{error}</p>}
 
-      {photos.length > 0 && (
-        <div className="flex flex-wrap gap-2 justify-center max-w-sm">
-          {photos.map((src, i) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              key={i}
-              src={src}
-              alt={`Photo ${i + 1}`}
-              className="w-32 h-32 object-cover rounded-lg border border-border"
-            />
-          ))}
-        </div>
-      )}
+      <PhotoThumbnailGrid
+        photos={photos}
+        total={Math.max(slotCount, photos.length)}
+        size={96}
+      />
 
       <div className="flex gap-3">
         <GoBackButton href={ROUTES.modeSelect} />
