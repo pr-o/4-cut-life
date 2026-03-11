@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -155,6 +156,8 @@ function EditContent() {
   const [shareConfirmOpen, setShareConfirmOpen] = useState(false);
   const [shareResultOpen, setShareResultOpen] = useState(false);
   const [shareLoading, setShareLoading] = useState(false);
+  const [gnbMounted, setGnbMounted] = useState(false);
+  useEffect(() => setGnbMounted(true), []);
 
   // Track mouse for sticker follower
   useEffect(() => {
@@ -223,7 +226,10 @@ function EditContent() {
       const formData = new FormData();
       formData.append("image", blob, "strip.png");
 
-      const response = await fetch("/api/upload", { method: "POST", body: formData });
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
       if (response.status === 429) {
         const { error } = await response.json();
         toast.error(error);
@@ -286,33 +292,40 @@ function EditContent() {
         </div>
       )}
 
-      {/* Top action bar */}
-      <div className="border-b px-6 py-3 flex flex-wrap gap-2 items-center justify-between">
-        <h1 className="text-lg font-semibold">Edit your strip</h1>
-        <div className="flex flex-wrap gap-2">
-          <Button size="sm" onClick={handleDownloadPng}>
-            Download
-          </Button>
-          {/* TODO: re-enable once QR sharing backend is ready
-          <Button size="sm" variant="outline" onClick={handleDownloadQr}>
-            Download via QR
-          </Button> */}
-          <Button size="sm" variant="outline" onClick={handleShare} disabled={shareLoading}>
-            {shareLoading ? "Uploading…" : "Share"}
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleDownloadGif}
-            disabled={gifLoading}
-          >
-            {gifLoading ? "Generating…" : "Download GIF"}
-          </Button>
-          <Button size="sm" variant="ghost" onClick={handleStartAgain}>
-            Start again
-          </Button>
-        </div>
-      </div>
+      {/* Inject action buttons into GNB via portal */}
+      {gnbMounted &&
+        document.getElementById("gnb-portal") &&
+        createPortal(
+          <>
+            <Button size="sm" onClick={handleDownloadPng}>
+              Download
+            </Button>
+            {/* TODO: re-enable once QR sharing backend is ready
+            <Button size="sm" variant="outline" onClick={handleDownloadQr}>
+              Download via QR
+            </Button> */}
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleShare}
+              disabled={shareLoading}
+            >
+              {shareLoading ? "Uploading…" : "Share"}
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleDownloadGif}
+              disabled={gifLoading}
+            >
+              {gifLoading ? "Generating…" : "Download GIF"}
+            </Button>
+            <Button size="sm" variant="ghost" onClick={handleStartAgain}>
+              Start again
+            </Button>
+          </>,
+          document.getElementById("gnb-portal")!,
+        )}
 
       <div className="flex flex-1 flex-col lg:flex-row gap-0">
         {/* Left — strip preview */}
@@ -424,8 +437,8 @@ function EditContent() {
               onClick={() => {
                 setFrameColor(DEFAULT_STRIP_CONFIG.frameColor);
                 setFrameWidth(DEFAULT_STRIP_CONFIG.frameWidth);
-                setGapX(4);
-                setGapY(4);
+                setGapX(DEFAULT_STRIP_CONFIG.gapX);
+                setGapY(DEFAULT_STRIP_CONFIG.gapY);
                 setPhotoWidth(null);
                 setFilter("none");
                 config.stickers.forEach((s) => removeSticker(s.id));
@@ -668,13 +681,21 @@ function EditContent() {
             <DialogTitle>Before you share</DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            Your photo strip will be <strong className="text-foreground">uploaded to the cloud</strong> and anyone with the link will be able to view and download it.
+            Your photo strip will be{" "}
+            <strong className="text-foreground">uploaded to the cloud</strong>{" "}
+            and anyone with the link will be able to view and download it.
           </p>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            The link will be available for <strong className="text-foreground">30 days</strong>, after which it will expire.
+            The link will be available for{" "}
+            <strong className="text-foreground">30 days</strong>, after which it
+            will expire.
           </p>
           <div className="flex gap-2 pt-1">
-            <Button variant="outline" className="flex-1" onClick={() => setShareConfirmOpen(false)}>
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={() => setShareConfirmOpen(false)}
+            >
               Cancel
             </Button>
             <Button className="flex-1" onClick={handleShareConfirm}>
@@ -691,7 +712,8 @@ function EditContent() {
             <DialogTitle>Share your strip</DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground">
-            Anyone with this link can view and download your photo strip for the next 30 days.
+            Anyone with this link can view and download your photo strip for the
+            next 30 days.
           </p>
           <div className="flex gap-2">
             <input
