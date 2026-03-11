@@ -433,10 +433,10 @@ function EditContent() {
               Filter
             </Label>
             <div className="grid grid-cols-3 gap-2">
-              {(Object.keys(FILTER_LABELS) as FilterId[]).map((id) => (
+              {(Object.keys(FILTER_LABELS) as FilterId[]).filter((id) => id !== "none").map((id) => (
                 <button
                   key={id}
-                  onClick={() => setFilter(id)}
+                  onClick={() => setFilter(id === config.filter ? "none" : id)}
                   className={cn(
                     "text-xs px-3 py-2 rounded-lg border transition-colors",
                     config.filter === id
