@@ -34,9 +34,9 @@ import { STICKER_COMPONENTS } from "@/components/stickers";
 import { exportStripPng, downloadDataUrl } from "@/lib/export/toPng";
 import { exportStripGif } from "@/lib/export/toGif";
 import { generateQrForStrip } from "@/lib/export/toQr";
-import { shareStrip } from "@/lib/export/share";
 import type { FilterId, StickerType } from "@/types";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 const FRAME_COLORS = [
   "#000000",
@@ -146,6 +146,10 @@ function EditContent() {
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [qrOpen, setQrOpen] = useState(false);
   const [gifLoading, setGifLoading] = useState(false);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [shareConfirmOpen, setShareConfirmOpen] = useState(false);
+  const [shareResultOpen, setShareResultOpen] = useState(false);
+  const [shareLoading, setShareLoading] = useState(false);
 
   // Track mouse for sticker follower
   useEffect(() => {
@@ -200,9 +204,36 @@ function EditContent() {
     setQrOpen(true);
   }
 
-  async function handleShare() {
-    const dataUrl = await getPngDataUrl();
-    await shareStrip(dataUrl);
+  function handleShare() {
+    setShareConfirmOpen(true);
+  }
+
+  async function handleShareConfirm() {
+    setShareConfirmOpen(false);
+    setShareLoading(true);
+    try {
+      const dataUrl = await getPngDataUrl();
+      const res = await fetch(dataUrl);
+      const blob = await res.blob();
+      const formData = new FormData();
+      formData.append("image", blob, "strip.png");
+
+      const response = await fetch("/api/upload", { method: "POST", body: formData });
+      if (response.status === 429) {
+        const { error } = await response.json();
+        toast.error(error);
+        return;
+      }
+      if (!response.ok) {
+        toast.error("Upload failed. Please try again.");
+        return;
+      }
+      const { url } = await response.json();
+      setShareUrl(url);
+      setShareResultOpen(true);
+    } finally {
+      setShareLoading(false);
+    }
   }
 
   async function handleDownloadGif() {
@@ -261,8 +292,8 @@ function EditContent() {
           <Button size="sm" variant="outline" onClick={handleDownloadQr}>
             Download via QR
           </Button> */}
-          <Button size="sm" variant="outline" onClick={handleShare}>
-            Share
+          <Button size="sm" variant="outline" onClick={handleShare} disabled={shareLoading}>
+            {shareLoading ? "Uploading…" : "Share"}
           </Button>
           <Button
             size="sm"
@@ -624,6 +655,57 @@ function EditContent() {
           </section>
         </aside>
       </div>
+
+      {/* Share — confirmation dialog */}
+      <Dialog open={shareConfirmOpen} onOpenChange={setShareConfirmOpen}>
+        <DialogContent className="max-w-sm space-y-4">
+          <DialogHeader>
+            <DialogTitle>Before you share</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            Your photo strip will be <strong className="text-foreground">uploaded to the cloud</strong> and anyone with the link will be able to view and download it.
+          </p>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            The link will be available for <strong className="text-foreground">30 days</strong>, after which it will expire.
+          </p>
+          <div className="flex gap-2 pt-1">
+            <Button variant="outline" className="flex-1" onClick={() => setShareConfirmOpen(false)}>
+              Cancel
+            </Button>
+            <Button className="flex-1" onClick={handleShareConfirm}>
+              Continue
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Share — result dialog */}
+      <Dialog open={shareResultOpen} onOpenChange={setShareResultOpen}>
+        <DialogContent className="max-w-sm space-y-4">
+          <DialogHeader>
+            <DialogTitle>Share your strip</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Anyone with this link can view and download your photo strip for the next 30 days.
+          </p>
+          <div className="flex gap-2">
+            <input
+              readOnly
+              value={shareUrl ?? ""}
+              className="flex-1 text-xs border rounded-md px-3 py-2 bg-muted truncate"
+            />
+            <Button
+              size="sm"
+              onClick={() => {
+                if (shareUrl) navigator.clipboard.writeText(shareUrl);
+                toast.success("Link copied!");
+              }}
+            >
+              Copy
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* QR Dialog */}
       <Dialog open={qrOpen} onOpenChange={setQrOpen}>
