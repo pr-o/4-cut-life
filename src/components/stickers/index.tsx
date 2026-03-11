@@ -54,16 +54,6 @@ function Crown({ size = 32 }: StickerProps) {
   )
 }
 
-function Ribbon({ size = 32 }: StickerProps) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
-      <path d="M16 16 L4 6 L10 16 L4 26 Z"  fill="#FF6B9D" />
-      <path d="M16 16 L28 6 L22 16 L28 26 Z" fill="#FF6B9D" />
-      <circle cx="16" cy="16" r="4" fill="#FFD700" />
-    </svg>
-  )
-}
-
 function Sparkle({ size = 32 }: StickerProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
@@ -77,22 +67,10 @@ function Sparkle({ size = 32 }: StickerProps) {
   )
 }
 
-function Bow({ size = 32 }: StickerProps) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
-      <ellipse cx="9"  cy="16" rx="8" ry="6" fill="#FF6B9D" />
-      <ellipse cx="23" cy="16" rx="8" ry="6" fill="#FF6B9D" />
-      <circle  cx="16" cy="16" r="4"         fill="#FF4081" />
-    </svg>
-  )
-}
-
 export const STICKER_COMPONENTS: Record<StickerType, React.FC<StickerProps>> = {
   star:    Star,
   heart:   Heart,
   flower:  Flower,
   crown:   Crown,
-  ribbon:  Ribbon,
   sparkle: Sparkle,
-  bow:     Bow,
 }

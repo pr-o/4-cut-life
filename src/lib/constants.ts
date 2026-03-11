@@ -39,16 +39,14 @@ export const STICKER_TYPES: StickerType[] = [
   "heart",
   "flower",
   "crown",
-  "ribbon",
   "sparkle",
-  "bow",
 ];
 
 export const DEFAULT_STRIP_CONFIG = {
   frameColor: "#000000",
   frameWidth: 12,
-  gapX: 4,
-  gapY: 4,
+  gapX: 8,
+  gapY: 8,
   photoWidth: null,
   filter: "none" as FilterId,
   stickers: [],
@@ -59,7 +57,12 @@ export const DEFAULT_STRIP_CONFIG = {
 export const PREVIEW_WIDTH = 400;
 export const EXPORT_PIXEL_RATIO = 3;
 
+export const PHOTO_WIDTH_STEP = 2;
+
 export const FRAME_WIDTH_MIN = 2;
 export const FRAME_WIDTH_MAX = 40;
+export const FRAME_WIDTH_STEP = 2;
+
 export const GAP_MIN = 2;
 export const GAP_MAX = 24;
+export const GAP_STEP = 2;

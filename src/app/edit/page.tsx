@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import NavigationGuard from "@/components/NavigationGuard";
 import PhotoStrip from "@/components/PhotoStrip";
+import StickerOverlay from "@/components/StickerOverlay";
 import { usePhotoStore } from "@/store/usePhotoStore";
 import { BlockPicker } from "react-color";
 import {
@@ -25,6 +26,9 @@ import {
   GAP_MIN,
   GAP_MAX,
   STICKER_TYPES,
+  GAP_STEP,
+  FRAME_WIDTH_STEP,
+  PHOTO_WIDTH_STEP,
 } from "@/lib/constants";
 import { STICKER_COMPONENTS } from "@/components/stickers";
 import { exportStripPng, downloadDataUrl } from "@/lib/export/toPng";
@@ -52,6 +56,8 @@ const FRAME_COLORS = [
 function EditContent() {
   const router = useRouter();
   const stripRef = useRef<HTMLDivElement>(null);
+  const stripWrapperRef = useRef<HTMLDivElement>(null);
+  const stickerPickerRef = useRef<HTMLDivElement>(null);
 
   const layout = usePhotoStore((s) => s.layout)!;
   const selectedPhotos = usePhotoStore((s) => s.selectedPhotos);
@@ -63,13 +69,97 @@ function EditContent() {
   const setPhotoWidth = usePhotoStore((s) => s.setPhotoWidth);
   const setFilter = usePhotoStore((s) => s.setFilter);
   const addSticker = usePhotoStore((s) => s.addSticker);
+  const updateSticker = usePhotoStore((s) => s.updateSticker);
   const removeSticker = usePhotoStore((s) => s.removeSticker);
   const setTimestamp = usePhotoStore((s) => s.setTimestamp);
   const reset = usePhotoStore((s) => s.reset);
 
+  const [activeStickerType, setActiveStickerType] =
+    useState<StickerType | null>(null);
+
+  // Keep stickers visually anchored when dimensions change.
+  // Grid expands symmetrically from center, so shift by half the total expansion.
+  const prevPhotoWidthRef = useRef(config.photoWidth ?? layout.width);
+  useEffect(() => {
+    const current = config.photoWidth ?? layout.width;
+    const prev = prevPhotoWidthRef.current;
+    if (current !== prev && config.stickers.length > 0) {
+      const delta = current - prev;
+      config.stickers.forEach((s) =>
+        updateSticker(s.id, { x: s.x + delta / 2 }),
+      );
+    }
+    prevPhotoWidthRef.current = current;
+  }, [config.photoWidth]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const prevGapXRef = useRef(config.gapX);
+  useEffect(() => {
+    const current = config.gapX;
+    const prev = prevGapXRef.current;
+    if (current !== prev && config.stickers.length > 0) {
+      const delta = current - prev;
+      // (cols - 1) gaps expand the grid; shift by half the total expansion
+      config.stickers.forEach((s) =>
+        updateSticker(s.id, { x: s.x + ((layout.cols - 1) * delta) / 2 }),
+      );
+    }
+    prevGapXRef.current = current;
+  }, [config.gapX]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const prevGapYRef = useRef(config.gapY);
+  useEffect(() => {
+    const current = config.gapY;
+    const prev = prevGapYRef.current;
+    if (current !== prev && config.stickers.length > 0) {
+      const delta = current - prev;
+      config.stickers.forEach((s) =>
+        updateSticker(s.id, { y: s.y + ((layout.rows - 1) * delta) / 2 }),
+      );
+    }
+    prevGapYRef.current = current;
+  }, [config.gapY]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [qrOpen, setQrOpen] = useState(false);
   const [gifLoading, setGifLoading] = useState(false);
+
+  // Track mouse for sticker follower
+  useEffect(() => {
+    if (!activeStickerType) return;
+    const onMove = (e: MouseEvent) =>
+      setMousePos({ x: e.clientX, y: e.clientY });
+    document.addEventListener("mousemove", onMove);
+    return () => document.removeEventListener("mousemove", onMove);
+  }, [activeStickerType]);
+
+  // Deactivate when clicking outside strip and sticker picker
+  useEffect(() => {
+    if (!activeStickerType) return;
+    const onClick = (e: MouseEvent) => {
+      const insideStrip = stripWrapperRef.current?.contains(e.target as Node);
+      const insidePicker = stickerPickerRef.current?.contains(e.target as Node);
+      if (!insideStrip && !insidePicker) setActiveStickerType(null);
+    };
+    document.addEventListener("click", onClick);
+    return () => document.removeEventListener("click", onClick);
+  }, [activeStickerType]);
+
+  function handleStripClick(e: React.MouseEvent<HTMLDivElement>) {
+    if (!activeStickerType || !stripRef.current) return;
+    const rect = stripRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left - config.frameWidth;
+    const y = e.clientY - rect.top - config.frameWidth;
+    addSticker({
+      id: crypto.randomUUID(),
+      type: activeStickerType,
+      x,
+      y,
+      scale: 1,
+      rotate: Math.round(Math.random() * 30 - 15),
+    });
+    setActiveStickerType(null);
+  }
 
   async function getPngDataUrl(): Promise<string> {
     return exportStripPng(stripRef.current!);
@@ -112,24 +202,31 @@ function EditContent() {
 
   function handleStartAgain() {
     router.replace("/layout-select");
-    setTimeout(() => {
-      reset();
-    }, 50);
+    setTimeout(() => reset(), 50);
   }
 
-  function handleAddSticker(type: StickerType) {
-    addSticker({
-      id: crypto.randomUUID(),
-      type,
-      x: 10 + Math.random() * 80,
-      y: 10 + Math.random() * 80,
-      scale: 1,
-      rotate: Math.round(Math.random() * 30 - 15),
-    });
-  }
+  const ActiveStickerIcon = activeStickerType
+    ? STICKER_COMPONENTS[activeStickerType]
+    : null;
 
   return (
     <main className="min-h-screen flex flex-col">
+      {/* Sticker cursor follower */}
+      {activeStickerType && ActiveStickerIcon && (
+        <div
+          style={{
+            position: "fixed",
+            left: mousePos.x,
+            top: mousePos.y,
+            transform: "translate(-50%, -50%)",
+            pointerEvents: "none",
+            zIndex: 9999,
+          }}
+        >
+          <ActiveStickerIcon size={36} />
+        </div>
+      )}
+
       {/* Top action bar */}
       <div className="border-b px-6 py-3 flex flex-wrap gap-2 items-center justify-between">
         <h1 className="text-lg font-semibold">Edit your strip</h1>
@@ -157,16 +254,33 @@ function EditContent() {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col lg:flex-row gap-0 ">
+      <div className="flex flex-1 flex-col lg:flex-row gap-0">
         {/* Left — strip preview */}
         <div className="flex-1 flex items-start justify-center p-8 bg-[#eee]">
-          <PhotoStrip
-            photos={selectedPhotos}
-            layout={layout}
-            config={config}
-            stripRef={stripRef}
-            className="shadow-xl"
-          />
+          <div
+            ref={stripWrapperRef}
+            onClick={handleStripClick}
+            style={{
+              position: "relative",
+              cursor: activeStickerType ? "none" : "default",
+            }}
+          >
+            <PhotoStrip
+              photos={selectedPhotos}
+              layout={layout}
+              config={config}
+              stripRef={stripRef}
+              className="shadow-xl"
+            />
+            <StickerOverlay
+              stickers={config.stickers}
+              stripRef={stripRef}
+              frameWidth={config.frameWidth}
+              disabled={!!activeStickerType}
+              onMove={(id, x, y) => updateSticker(id, { x, y })}
+              onResize={(id, scale) => updateSticker(id, { scale })}
+            />
+          </div>
         </div>
 
         {/* Right — controls */}
@@ -198,7 +312,7 @@ function EditContent() {
               Frame color
             </Label>
             <BlockPicker
-              triangle={"hide"}
+              triangle="hide"
               width="100%"
               color={config.frameColor}
               colors={FRAME_COLORS}
@@ -219,7 +333,7 @@ function EditContent() {
             <Slider
               min={layout?.width}
               max={layout?.height}
-              step={1}
+              step={PHOTO_WIDTH_STEP}
               value={[config.photoWidth ?? layout?.width]}
               onValueChange={([v]) =>
                 setPhotoWidth(v === layout?.width ? null : v)
@@ -240,7 +354,7 @@ function EditContent() {
             <Slider
               min={FRAME_WIDTH_MIN}
               max={FRAME_WIDTH_MAX}
-              step={2}
+              step={FRAME_WIDTH_STEP}
               value={[config.frameWidth]}
               onValueChange={([v]) => setFrameWidth(v)}
             />
@@ -263,7 +377,7 @@ function EditContent() {
               <Slider
                 min={GAP_MIN}
                 max={GAP_MAX}
-                step={1}
+                step={GAP_STEP}
                 value={[config.gapX]}
                 onValueChange={([v]) => setGapX(v)}
               />
@@ -276,7 +390,7 @@ function EditContent() {
               <Slider
                 min={GAP_MIN}
                 max={GAP_MAX}
-                step={1}
+                step={GAP_STEP}
                 value={[config.gapY]}
                 onValueChange={([v]) => setGapY(v)}
               />
@@ -307,9 +421,14 @@ function EditContent() {
           </section>
 
           {/* Stickers */}
-          <section className="space-y-3">
+          <section className="space-y-3" ref={stickerPickerRef}>
             <Label className="text-xs uppercase tracking-wider text-muted-foreground">
               Stickers
+              {activeStickerType && (
+                <span className="ml-2 normal-case text-primary">
+                  — click on the strip to place
+                </span>
+              )}
             </Label>
             <div className="flex flex-wrap gap-2">
               {STICKER_TYPES.map((type) => {
@@ -317,8 +436,17 @@ function EditContent() {
                 return (
                   <button
                     key={type}
-                    onClick={() => handleAddSticker(type)}
-                    className="w-10 h-10 rounded-lg border border-border hover:border-primary/40 flex items-center justify-center transition-colors"
+                    onClick={() =>
+                      setActiveStickerType(
+                        activeStickerType === type ? null : type,
+                      )
+                    }
+                    className={cn(
+                      "w-10 h-10 rounded-lg border-2 flex items-center justify-center transition-colors",
+                      activeStickerType === type
+                        ? "border-primary bg-primary/5"
+                        : "border-border hover:border-primary/40",
+                    )}
                     title={type}
                   >
                     <Icon size={24} />
