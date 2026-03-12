@@ -34,7 +34,7 @@ import {
   PHOTO_WIDTH_STEP,
 } from "@/lib/constants";
 import { STICKER_COMPONENTS } from "@/components/stickers";
-import { exportStripPng, downloadDataUrl } from "@/lib/export/toPng";
+import { exportStripPng, downloadDataUrl, dataUrlToBlob } from "@/lib/export/toPng";
 import { exportStripGif } from "@/lib/export/toGif";
 import { generateQrForStrip } from "@/lib/export/toQr";
 import type { FilterId, StickerType } from "@/types";
@@ -223,8 +223,7 @@ function EditContent() {
     setShareLoading(true);
     try {
       const dataUrl = await getPngDataUrl();
-      const res = await fetch(dataUrl);
-      const blob = await res.blob();
+      const blob = dataUrlToBlob(dataUrl);
       const formData = new FormData();
       formData.append("image", blob, "strip.png");
 

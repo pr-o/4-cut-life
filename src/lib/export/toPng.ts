@@ -13,9 +13,18 @@ export async function exportStripPng(element: HTMLElement): Promise<string> {
   return toPng(element, options)
 }
 
+/** Converts a data URL to a Blob without using fetch() (which fails on iOS Safari) */
+export function dataUrlToBlob(dataUrl: string): Blob {
+  const [header, base64] = dataUrl.split(",")
+  const mime = header.match(/:(.*?);/)?.[1] ?? "image/png"
+  const bytes = atob(base64)
+  const arr = new Uint8Array(bytes.length)
+  for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i)
+  return new Blob([arr], { type: mime })
+}
+
 export async function downloadDataUrl(dataUrl: string, filename: string) {
-  const res = await fetch(dataUrl)
-  const blob = await res.blob()
+  const blob = dataUrlToBlob(dataUrl)
   const file = new File([blob], filename, { type: "image/png" })
 
   // iOS Safari ignores the download attribute — use Web Share API instead
