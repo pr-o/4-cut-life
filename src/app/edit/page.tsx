@@ -4,9 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -16,6 +14,10 @@ import {
 import NavigationGuard from "@/components/NavigationGuard";
 import PhotoStrip from "@/components/PhotoStrip";
 import StickerOverlay from "@/components/StickerOverlay";
+import SectionLabel from "@/components/SectionLabel";
+import SliderControl from "@/components/SliderControl";
+import SelectOptionButton from "@/components/SelectOptionButton";
+import SelectablePhotoThumbnail from "@/components/SelectablePhotoThumbnail";
 import { usePhotoStore } from "@/store/usePhotoStore";
 import { BlockPicker } from "react-color";
 import {
@@ -32,7 +34,7 @@ import {
   PHOTO_WIDTH_STEP,
 } from "@/lib/constants";
 import { STICKER_COMPONENTS } from "@/components/stickers";
-import { exportStripPng, downloadDataUrl } from "@/lib/export/toPng";
+import { exportStripPng, downloadDataUrl, dataUrlToBlob } from "@/lib/export/toPng";
 import { exportStripGif } from "@/lib/export/toGif";
 import { generateQrForStrip } from "@/lib/export/toQr";
 import type { FilterId, StickerType } from "@/types";
@@ -86,7 +88,7 @@ function EditContent() {
 
   // Default to 150% on medium+ screens
   useEffect(() => {
-    if (window.innerWidth >= 768) setZoom(1.5);
+    if (window.innerWidth >= 768) setZoom(1.25);
   }, []);
 
   const required = layout.cols * layout.rows;
@@ -221,8 +223,7 @@ function EditContent() {
     setShareLoading(true);
     try {
       const dataUrl = await getPngDataUrl();
-      const res = await fetch(dataUrl);
-      const blob = await res.blob();
+      const blob = dataUrlToBlob(dataUrl);
       const formData = new FormData();
       formData.append("image", blob, "strip.png");
 
@@ -405,33 +406,17 @@ function EditContent() {
             >
               Deselect all
             </button>
-            {capturedPhotos.map((src, i) => {
-              const selIdx = selectedPhotos.indexOf(src);
-              const isSelected = selIdx !== -1;
-              return (
-                <button
-                  key={i}
-                  onClick={() => handleThumbnailToggle(src)}
-                  className="relative shrink-0 rounded overflow-hidden"
-                  style={{ width: 72, height: 72 }}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={src}
-                    alt={`Photo ${i + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                  {!isSelected && (
-                    <div className="absolute inset-0 bg-black/40" />
-                  )}
-                  {isSelected && (
-                    <div className="absolute top-1 right-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
-                      {selIdx + 1}
-                    </div>
-                  )}
-                </button>
-              );
-            })}
+            {capturedPhotos.map((src, i) => (
+              <SelectablePhotoThumbnail
+                key={i}
+                src={src}
+                index={i}
+                selectedIndex={selectedPhotos.indexOf(src)}
+                disabled={false}
+                size={72}
+                onClick={() => handleThumbnailToggle(src)}
+              />
+            ))}
           </div>
         )}
 
@@ -460,9 +445,7 @@ function EditContent() {
 
           {/* Frame color */}
           <section className="space-y-3">
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground">
-              Frame color
-            </Label>
+            <SectionLabel>Frame color</SectionLabel>
             <BlockPicker
               triangle="hide"
               width="100%"
@@ -472,79 +455,43 @@ function EditContent() {
             />
           </section>
 
-          {/* Photo width */}
-          <section className="space-y-3">
-            <div className="flex justify-between items-center">
-              <Label className="text-xs uppercase tracking-wider text-muted-foreground">
-                Photo width
-              </Label>
-              <span className="text-xs text-muted-foreground">
-                {config.photoWidth ?? layout?.width}px
-              </span>
-            </div>
-            <Slider
-              min={layout?.width}
-              max={layout?.height}
-              step={PHOTO_WIDTH_STEP}
-              value={[config.photoWidth ?? layout?.width]}
-              onValueChange={([v]) =>
-                setPhotoWidth(v === layout?.width ? null : v)
-              }
-            />
-          </section>
+          <SliderControl
+            label="Photo width"
+            value={config.photoWidth ?? layout.width}
+            min={layout.width}
+            max={layout.height}
+            step={PHOTO_WIDTH_STEP}
+            onChange={(v) => setPhotoWidth(v === layout.width ? null : v)}
+          />
 
-          {/* Frame width */}
-          <section className="space-y-3">
-            <div className="flex justify-between items-center">
-              <Label className="text-xs uppercase tracking-wider text-muted-foreground">
-                Frame width
-              </Label>
-              <span className="text-xs text-muted-foreground">
-                {config.frameWidth}px
-              </span>
-            </div>
-            <Slider
-              min={FRAME_WIDTH_MIN}
-              max={FRAME_WIDTH_MAX}
-              step={FRAME_WIDTH_STEP}
-              value={[config.frameWidth]}
-              onValueChange={([v]) => setFrameWidth(v)}
-            />
-          </section>
+          <SliderControl
+            label="Frame width"
+            value={config.frameWidth}
+            min={FRAME_WIDTH_MIN}
+            max={FRAME_WIDTH_MAX}
+            step={FRAME_WIDTH_STEP}
+            onChange={setFrameWidth}
+          />
 
           {/* Gap X / Y */}
           <section className="space-y-3">
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground">
-              Gap
-            </Label>
+            <SectionLabel>Gap</SectionLabel>
             <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-muted-foreground">
-                  Horizontal
-                </span>
-                <span className="text-xs text-muted-foreground">
-                  {config.gapX}px
-                </span>
-              </div>
-              <Slider
+              <SliderControl
+                label="Horizontal"
+                value={config.gapX}
                 min={GAP_MIN}
                 max={GAP_MAX}
                 step={GAP_STEP}
-                value={[config.gapX]}
-                onValueChange={([v]) => setGapX(v)}
+                onChange={setGapX}
               />
-              <div className="flex justify-between items-center mt-2">
-                <span className="text-xs text-muted-foreground">Vertical</span>
-                <span className="text-xs text-muted-foreground">
-                  {config.gapY}px
-                </span>
-              </div>
-              <Slider
+              <SliderControl
+                label="Vertical"
+                value={config.gapY}
                 min={GAP_MIN}
                 max={GAP_MAX}
                 step={GAP_STEP}
-                value={[config.gapY]}
-                onValueChange={([v]) => setGapY(v)}
+                onChange={setGapY}
               />
             </div>
           </section>
@@ -552,9 +499,7 @@ function EditContent() {
           {/* Timestamp */}
           <section className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label className="text-xs uppercase tracking-wider text-muted-foreground">
-                Timestamp
-              </Label>
+              <SectionLabel>Timestamp</SectionLabel>
               <button
                 onClick={() => {
                   const turningOn = !config.showTimestamp;
@@ -596,41 +541,35 @@ function EditContent() {
 
           {/* Filter */}
           <section className="space-y-3">
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground">
-              Filter
-            </Label>
+            <SectionLabel>Filter</SectionLabel>
             <div className="grid grid-cols-3 gap-2">
               {(Object.keys(FILTER_LABELS) as FilterId[])
                 .filter((id) => id !== "none")
                 .map((id) => (
-                  <button
+                  <SelectOptionButton
                     key={id}
+                    selected={config.filter === id}
                     onClick={() =>
                       setFilter(id === config.filter ? "none" : id)
                     }
-                    className={cn(
-                      "text-xs px-3 py-2 rounded-lg border transition-colors",
-                      config.filter === id
-                        ? "border-primary bg-primary/5 font-medium"
-                        : "border-border hover:border-primary/40",
-                    )}
+                    className="text-xs px-3 py-2"
                   >
                     {FILTER_LABELS[id]}
-                  </button>
+                  </SelectOptionButton>
                 ))}
             </div>
           </section>
 
           {/* Stickers */}
           <section className="space-y-3" ref={stickerPickerRef}>
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground">
+            <SectionLabel>
               Stickers
               {activeStickerType && (
                 <span className="ml-2 normal-case text-primary">
                   — click on the strip to place
                 </span>
               )}
-            </Label>
+            </SectionLabel>
             <div className="flex flex-wrap gap-2">
               {STICKER_TYPES.map((type) => {
                 const Icon = STICKER_COMPONENTS[type];

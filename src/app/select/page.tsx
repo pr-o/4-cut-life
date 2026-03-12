@@ -4,8 +4,8 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import NavigationGuard from "@/components/NavigationGuard"
+import SelectablePhotoThumbnail from "@/components/SelectablePhotoThumbnail"
 import { usePhotoStore } from "@/store/usePhotoStore"
-import { cn } from "@/lib/utils"
 
 function SelectContent() {
   const router = useRouter()
@@ -43,37 +43,16 @@ function SelectContent() {
       </div>
 
       <div className="grid grid-cols-4 gap-2 w-full max-w-sm">
-        {capturedPhotos.map((src, i) => {
-          const selectedIndex = selected.indexOf(src)
-          const isSelected = selectedIndex !== -1
-          return (
-            <button
-              key={i}
-              onClick={() => toggle(src)}
-              className={cn(
-                "relative aspect-square rounded-lg overflow-hidden border-2 transition-all",
-                isSelected ? "border-primary" : "border-transparent"
-              )}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={src}
-                alt={`Photo ${i + 1}`}
-                className="w-full h-full object-cover"
-              />
-              {isSelected && (
-                <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
-                  <span className="bg-primary text-primary-foreground text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                    {selectedIndex + 1}
-                  </span>
-                </div>
-              )}
-              {!isSelected && selected.length >= required && (
-                <div className="absolute inset-0 bg-black/30" />
-              )}
-            </button>
-          )
-        })}
+        {capturedPhotos.map((src, i) => (
+          <SelectablePhotoThumbnail
+            key={i}
+            src={src}
+            index={i}
+            selectedIndex={selected.indexOf(src)}
+            disabled={selected.length >= required}
+            onClick={() => toggle(src)}
+          />
+        ))}
       </div>
 
       <Button

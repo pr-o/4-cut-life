@@ -4,9 +4,9 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import NavigationGuard from "@/components/NavigationGuard";
 import GoBackButton from "@/components/GoBackButton";
+import SelectOptionButton from "@/components/SelectOptionButton";
 import { usePhotoStore } from "@/store/usePhotoStore";
 import { ROUTES } from "@/lib/routes";
-import { cn } from "@/lib/utils";
 
 const COUNTDOWN_OPTIONS = [1, 2, 3, 5, 10];
 
@@ -48,18 +48,13 @@ function InstructionsContent() {
         <p className="text-sm font-medium">Pause between shots</p>
         <div className="flex gap-2">
           {COUNTDOWN_OPTIONS.map((sec) => (
-            <button
+            <SelectOptionButton
               key={sec}
+              selected={countdownSeconds === sec}
               onClick={() => setCountdownSeconds(sec)}
-              className={cn(
-                "flex-1 py-2 rounded-lg border-2 text-sm font-medium transition-colors",
-                countdownSeconds === sec
-                  ? "border-primary bg-primary/5"
-                  : "border-border hover:border-primary/40",
-              )}
             >
               {sec}s
-            </button>
+            </SelectOptionButton>
           ))}
         </div>
       </div>
@@ -69,15 +64,10 @@ function InstructionsContent() {
         <p className="text-sm font-medium">Number of photos to take</p>
         <div className="flex gap-2">
           {photoCountOptions.map((count, i) => (
-            <button
+            <SelectOptionButton
               key={count}
+              selected={resolvedPhotoCount === count}
               onClick={() => setPhotoCount(count)}
-              className={cn(
-                "flex-1 py-2 rounded-lg border-2 text-sm font-medium transition-colors",
-                resolvedPhotoCount === count
-                  ? "border-primary bg-primary/5"
-                  : "border-border hover:border-primary/40",
-              )}
             >
               {count}
               {i === 0 && (
@@ -85,7 +75,7 @@ function InstructionsContent() {
                   default
                 </span>
               )}
-            </button>
+            </SelectOptionButton>
           ))}
         </div>
       </div>

@@ -3,6 +3,7 @@
 import type { Layout, StripConfig } from "@/types";
 import { APP_TITLE, FILTER_CSS } from "@/lib/constants";
 import { STICKER_COMPONENTS } from "@/components/stickers";
+import PhotoOrPlaceholder from "@/components/PhotoOrPlaceholder";
 
 type Props = {
   photos: string[];
@@ -60,33 +61,16 @@ export default function PhotoStrip({
           gap: `${gapY}px ${gapX}px`,
         }}
       >
-        {photos.map((src, i) =>
-          src ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              key={i}
-              src={src}
-              alt={`Photo ${i + 1}`}
-              draggable="false"
-              style={{
-                display: "block",
-                objectFit: "cover",
-                width: photoWidth,
-                height: photoHeight,
-                filter: cssFilter,
-              }}
-            />
-          ) : (
-            <div
-              key={i}
-              style={{
-                width: photoWidth,
-                height: photoHeight,
-                backgroundColor: "#d1d5db",
-              }}
-            />
-          ),
-        )}
+        {photos.map((src, i) => (
+          <PhotoOrPlaceholder
+            key={i}
+            src={src}
+            index={i}
+            width={photoWidth}
+            height={photoHeight}
+            style={{ objectFit: "cover", filter: cssFilter }}
+          />
+        ))}
       </div>
 
       {/* Timestamp */}
