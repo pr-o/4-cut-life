@@ -35,9 +35,12 @@ export async function POST(request: NextRequest) {
   }
 
   const buffer = await file.arrayBuffer()
-  const stripRef = ref(storage, `strips/${crypto.randomUUID()}.png`)
+  const isJpeg = file.type === "image/jpeg" || file.name.endsWith(".jpg")
+  const ext = isJpeg ? "jpg" : "png"
+  const contentType = isJpeg ? "image/jpeg" : "image/png"
+  const stripRef = ref(storage, `strips/${crypto.randomUUID()}.${ext}`)
 
-  await uploadBytes(stripRef, buffer, { contentType: "image/png" })
+  await uploadBytes(stripRef, buffer, { contentType })
   const firebaseUrl = await getDownloadURL(stripRef)
 
   // Store short ID → Firebase URL in Redis with 30-day expiry
