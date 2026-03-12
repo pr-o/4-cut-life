@@ -312,6 +312,20 @@ function EditContent() {
         </div>
       )}
 
+      {/* Full-screen upload spinner */}
+      {shareLoading && (
+        <div
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-background/80 backdrop-blur-sm overflow-hidden select-none"
+          ref={(el) => {
+            if (el) document.body.style.overflow = "hidden";
+            else document.body.style.overflow = "";
+          }}
+        >
+          <div className="w-10 h-10 border-4 border-border border-t-primary rounded-full animate-spin" />
+          <p className="text-sm text-muted-foreground">Uploading your strip…</p>
+        </div>
+      )}
+
       {/* Inject action buttons into GNB via portal */}
       {gnbMounted &&
         document.getElementById("gnb-portal") &&
@@ -665,7 +679,11 @@ function EditContent() {
 
       {/* Share — result dialog */}
       <Dialog open={shareResultOpen} onOpenChange={setShareResultOpen}>
-        <DialogContent className="max-w-sm space-y-4">
+        <DialogContent
+          className="max-w-sm space-y-4"
+          onInteractOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
+        >
           <DialogHeader>
             <DialogTitle>Share your strip</DialogTitle>
           </DialogHeader>
