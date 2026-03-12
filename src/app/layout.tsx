@@ -10,6 +10,7 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000"),
   title: "4-Cut Life | 인생네컷",
   description: "Your own Life-4-Cuts photo booth experience",
   openGraph: {
