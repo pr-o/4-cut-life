@@ -41,7 +41,6 @@ import {
   compressToTarget,
 } from "@/lib/export/toPng";
 import { exportStripGif } from "@/lib/export/toGif";
-import { generateQrForStrip } from "@/lib/export/toQr";
 import type { FilterId, StickerType } from "@/types";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -156,8 +155,6 @@ function EditContent() {
   }, [config.gapY]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
-  const [qrOpen, setQrOpen] = useState(false);
   const [gifLoading, setGifLoading] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [shareConfirmOpen, setShareConfirmOpen] = useState(false);
@@ -211,13 +208,6 @@ function EditContent() {
     const dataUrl = await getPngDataUrl();
     await downloadDataUrl(dataUrl, "4-cut-life.png");
     toast.success("Download complete!");
-  }
-
-  async function handleDownloadQr() {
-    const dataUrl = await getPngDataUrl();
-    const qr = await generateQrForStrip(dataUrl, window.location.origin);
-    setQrDataUrl(qr);
-    setQrOpen(true);
   }
 
   function handleShare() {
@@ -335,10 +325,6 @@ function EditContent() {
             <Button size="sm" onClick={handleDownloadPng}>
               Download
             </Button>
-            {/* TODO: re-enable once QR sharing backend is ready
-            <Button size="sm" variant="outline" onClick={handleDownloadQr}>
-              Download via QR
-            </Button> */}
             <Button
               size="sm"
               variant="outline"
@@ -717,21 +703,6 @@ function EditContent() {
         </DialogContent>
       </Dialog>
 
-      {/* QR Dialog */}
-      <Dialog open={qrOpen} onOpenChange={setQrOpen}>
-        <DialogContent className="max-w-xs text-center">
-          <DialogHeader>
-            <DialogTitle>Scan to download</DialogTitle>
-          </DialogHeader>
-          {qrDataUrl && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={qrDataUrl} alt="QR code" className="mx-auto w-48 h-48" />
-          )}
-          <p className="text-xs text-muted-foreground">
-            Scan this QR code on another device to view and download your strip.
-          </p>
-        </DialogContent>
-      </Dialog>
     </main>
   );
 }
