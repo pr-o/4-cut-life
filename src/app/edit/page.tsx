@@ -40,8 +40,8 @@ import {
   downloadDataUrl,
   compressToTarget,
 } from "@/lib/export/toPng";
+import { isMobile } from "@/lib/export/utils";
 import { exportStripGif } from "@/lib/export/toGif";
-import { generateQrForStrip } from "@/lib/export/toQr";
 import type { FilterId, StickerType } from "@/types";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -156,8 +156,6 @@ function EditContent() {
   }, [config.gapY]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
-  const [qrOpen, setQrOpen] = useState(false);
   const [gifLoading, setGifLoading] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [shareConfirmOpen, setShareConfirmOpen] = useState(false);
@@ -213,13 +211,6 @@ function EditContent() {
     toast.success("Download complete!");
   }
 
-  async function handleDownloadQr() {
-    const dataUrl = await getPngDataUrl();
-    const qr = await generateQrForStrip(dataUrl, window.location.origin);
-    setQrDataUrl(qr);
-    setQrOpen(true);
-  }
-
   function handleShare() {
     setShareConfirmOpen(true);
   }
@@ -262,14 +253,16 @@ function EditContent() {
   async function handleDownloadGif() {
     setGifLoading(true);
     try {
+      const photoWidth = config.photoWidth ?? layout.width;
       const blob = await exportStripGif(
         selectedPhotos,
         FILTER_CSS[config.filter],
+        photoWidth / layout.height,
       );
       const filename = "4-cut-life.gif";
       const file = new File([blob], filename, { type: "image/gif" });
 
-      if (navigator.canShare?.({ files: [file] })) {
+      if (isMobile && navigator.canShare?.({ files: [file] })) {
         await navigator.share({ files: [file], title: filename });
       } else {
         const url = URL.createObjectURL(blob);
@@ -335,10 +328,6 @@ function EditContent() {
             <Button size="sm" onClick={handleDownloadPng}>
               Download
             </Button>
-            {/* TODO: re-enable once QR sharing backend is ready
-            <Button size="sm" variant="outline" onClick={handleDownloadQr}>
-              Download via QR
-            </Button> */}
             <Button
               size="sm"
               variant="outline"
@@ -717,21 +706,6 @@ function EditContent() {
         </DialogContent>
       </Dialog>
 
-      {/* QR Dialog */}
-      <Dialog open={qrOpen} onOpenChange={setQrOpen}>
-        <DialogContent className="max-w-xs text-center">
-          <DialogHeader>
-            <DialogTitle>Scan to download</DialogTitle>
-          </DialogHeader>
-          {qrDataUrl && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={qrDataUrl} alt="QR code" className="mx-auto w-48 h-48" />
-          )}
-          <p className="text-xs text-muted-foreground">
-            Scan this QR code on another device to view and download your strip.
-          </p>
-        </DialogContent>
-      </Dialog>
     </main>
   );
 }

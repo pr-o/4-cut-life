@@ -7,5 +7,4 @@ export const ROUTES = {
   upload:        "/upload",
   select:        "/select",
   edit:          "/edit",
-  view:          "/view",
 } as const;
