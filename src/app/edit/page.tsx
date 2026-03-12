@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
+import { QRCodeSVG } from "qrcode.react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -689,7 +690,8 @@ function EditContent() {
           </DialogHeader>
           <p className="text-sm text-muted-foreground">
             Anyone with this link can view and download your photo strip for the
-            next 30 days.
+            next 30 days. You can also scan the QR code below with your camera
+            to access.
           </p>
           <div className="flex gap-2">
             <input
@@ -707,6 +709,11 @@ function EditContent() {
               Copy
             </Button>
           </div>
+          {shareUrl && (
+            <div className="flex justify-center pt-2">
+              <QRCodeSVG value={shareUrl} size={160} />
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
