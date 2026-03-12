@@ -23,13 +23,42 @@ export function dataUrlToBlob(dataUrl: string): Blob {
   return new Blob([arr], { type: mime })
 }
 
-export async function downloadDataUrl(dataUrl: string, filename: string) {
-  const blob = dataUrlToBlob(dataUrl)
-  const file = new File([blob], filename, { type: "image/png" })
+const TARGET_BYTES = 1024 * 1024 // 1MB
 
-  // iOS Safari ignores the download attribute — use Web Share API instead
+/**
+ * Compresses a PNG data URL to a JPEG blob under 1MB.
+ * Starts at 92% quality and steps down by 5% until under the target.
+ */
+export async function compressToTarget(dataUrl: string): Promise<Blob> {
+  const img = await new Promise<HTMLImageElement>((resolve) => {
+    const i = new window.Image()
+    i.onload = () => resolve(i)
+    i.src = dataUrl
+  })
+  const canvas = document.createElement("canvas")
+  canvas.width = img.width
+  canvas.height = img.height
+  canvas.getContext("2d")!.drawImage(img, 0, 0)
+
+  let quality = 0.92
+  let blob = dataUrlToBlob(canvas.toDataURL("image/jpeg", quality))
+  while (blob.size > TARGET_BYTES && quality > 0.1) {
+    quality = Math.max(0.1, +(quality - 0.05).toFixed(2))
+    blob = dataUrlToBlob(canvas.toDataURL("image/jpeg", quality))
+  }
+  return blob
+}
+
+const isMobile = typeof navigator !== "undefined" &&
+  /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+
+export async function downloadDataUrl(dataUrl: string, filename: string) {
+  const blob = await compressToTarget(dataUrl)
+  const file = new File([blob], filename.replace(/\.png$/, ".jpg"), { type: "image/jpeg" })
+
+  // On mobile, the download attribute is unreliable — use Web Share API
   // so the user can save to their camera roll from the share sheet
-  if (navigator.canShare?.({ files: [file] })) {
+  if (isMobile && navigator.canShare?.({ files: [file] })) {
     await navigator.share({ files: [file], title: filename })
     return
   }
