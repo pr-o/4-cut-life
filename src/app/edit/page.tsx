@@ -34,7 +34,11 @@ import {
   PHOTO_WIDTH_STEP,
 } from "@/lib/constants";
 import { STICKER_COMPONENTS } from "@/components/stickers";
-import { exportStripPng, downloadDataUrl, compressToTarget } from "@/lib/export/toPng";
+import {
+  exportStripPng,
+  downloadDataUrl,
+  compressToTarget,
+} from "@/lib/export/toPng";
 import { exportStripGif } from "@/lib/export/toGif";
 import { generateQrForStrip } from "@/lib/export/toQr";
 import type { FilterId, StickerType } from "@/types";
@@ -204,7 +208,8 @@ function EditContent() {
 
   async function handleDownloadPng() {
     const dataUrl = await getPngDataUrl();
-    downloadDataUrl(dataUrl, "4-cut-life.png");
+    await downloadDataUrl(dataUrl, "4-cut-life.png");
+    toast.success("Download complete!");
   }
 
   async function handleDownloadQr() {
@@ -240,7 +245,9 @@ function EditContent() {
       }
       if (!response.ok) {
         const body = await response.json().catch(() => ({}));
-        toast.error(`Upload failed (${response.status}): ${body.error ?? "Please try again."}`);
+        toast.error(
+          `Upload failed (${response.status}): ${body.error ?? "Please try again."}`,
+        );
         return;
       }
       const { url } = await response.json();
@@ -673,7 +680,7 @@ function EditContent() {
               className="flex-1 text-xs border rounded-md px-3 py-2 bg-muted truncate"
             />
             <Button
-              size="sm"
+              size="lg"
               onClick={() => {
                 if (shareUrl) navigator.clipboard.writeText(shareUrl);
                 toast.success("Link copied!");

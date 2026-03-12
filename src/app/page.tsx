@@ -7,25 +7,25 @@ const EXAMPLE_STRIPS = [
     id: 1,
     cols: 1,
     rows: 4,
-    colors: ["#f9a8d4", "#fbcfe8", "#fce7f3", "#fdf2f8"],
+    colors: ["#bbf7d0", "#86efac", "#4ade80", "#d1fae5"],
   },
   {
     id: 2,
     cols: 1,
     rows: 3,
-    colors: ["#bbf7d0", "#86efac", "#4ade80"],
+    colors: ["#f9a8d4", "#fbcfe8", "#fce7f3"],
   },
   {
     id: 3,
     cols: 2,
-    rows: 2,
-    colors: ["#bfdbfe", "#93c5fd", "#ddd6fe", "#c4b5fd"],
+    rows: 3,
+    colors: ["#fde68a", "#fcd34d", "#fbbf24", "#fed7aa", "#fdba74", "#fb923c"],
   },
   {
     id: 4,
     cols: 2,
-    rows: 3,
-    colors: ["#fde68a", "#fcd34d", "#fbbf24", "#fed7aa", "#fdba74", "#fb923c"],
+    rows: 2,
+    colors: ["#bfdbfe", "#93c5fd", "#ddd6fe", "#c4b5fd"],
   },
 ];
 
@@ -85,8 +85,10 @@ export default function LandingPage() {
 
       {/* Example strips gallery */}
       <div className="flex items-end gap-6 overflow-x-auto px-4 py-4">
-        {EXAMPLE_STRIPS.map((strip) => (
-          <ExampleStrip key={strip.id} {...strip} />
+        {EXAMPLE_STRIPS.map((strip, i) => (
+          <div key={strip.id} className={i === 1 ? "hidden sm:block" : ""}>
+            <ExampleStrip {...strip} />
+          </div>
         ))}
       </div>
 
