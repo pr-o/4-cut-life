@@ -17,7 +17,7 @@ A web-based re-creation of Life-4-Cuts, a.k.a. "인생네컷".
 - Tailwind CSS + shadcn/ui (UI 컴포넌트)
 - Zustand (전역 상태 관리)
 - html-to-image (DOM → PNG 내보내기)
-- gifenc (애니메이션 GIF 생성)
+- gifenc (Web Worker 기반 애니메이션 GIF 생성)
 - react-color (프레임 색상 선택기)
 - qrcode.react (공유 링크 QR 코드 표시)
 - Firebase Storage (공유 이미지 업로드)
@@ -42,6 +42,49 @@ A web-based re-creation of Life-4-Cuts, a.k.a. "인생네컷".
 - 공유 다이얼로그에 QR 코드 표시 — 카메라로 스캔하여 바로 접속 가능
 - IP당 하루 최대 20회 업로드 제한 (Upstash Redis 슬라이딩 윈도우)
 
+## 테스트
+
+### E2E 테스트 (Playwright)
+
+```bash
+pnpm test                        # 전체 E2E 테스트 실행
+pnpm test:ui                     # 인터랙티브 UI 모드
+pnpm test:snapshots              # 스냅샷 테스트만 실행
+pnpm test:update-snapshots       # 스냅샷 기준선 갱신
+```
+
+- Chromium 단독 실행, `localhost:3000` 기준 (`pnpm build && pnpm start` 필요)
+- 테스트 파일 위치: `tests/`
+- 커버 범위: 랜딩, 레이아웃 선택, 모드 선택, 업로드 플로우, 편집 페이지, GNB 동작
+- 스냅샷 테스트: 주요 페이지 상태 + 실제 Firebase 업로드를 포함한 공유 페이지 E2E 테스트
+- Playwright MCP 서버 설정 완료 (`~/.claude/settings.json`) — Claude가 브라우저를 직접 제어 가능
+
+### 단위 테스트 (Jest + React Testing Library)
+
+```bash
+pnpm test:unit                   # 단위 테스트 실행
+pnpm test:unit:watch             # 워치 모드
+```
+
+- 테스트 파일 위치: `src/__tests__/`
+- 커버 범위:
+  - `utils.test.ts` — `dataUrlToBlob`, `isMobile`, `isIosSafari` 유틸리티 함수
+  - `store.test.ts` — Zustand 스토어 액션 및 상태 변이
+  - `components.test.tsx` — `SelectOptionButton`, `SectionLabel`, `SliderControl`, `PhotoThumbnailGrid`, `PhotoOrPlaceholder` 컴포넌트
+
+## 환경 변수
+
+`.env.local.example` 파일을 복사하여 `.env.local`로 작성:
+
+```bash
+cp .env.local.example .env.local
+```
+
+필요한 값:
+- Firebase 프로젝트 설정 (`NEXT_PUBLIC_FIREBASE_*`)
+- Upstash Redis REST URL 및 토큰 (`UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`)
+- 배포 도메인 (`NEXT_PUBLIC_BASE_URL`) — OG 메타태그 절대 URL 생성에 필요
+
 ## 개선할 점
 
 - [ ] 스티커 기능에서 SVG 드래그 앤 드롭이 일부 모바일 브라우저에서 불안정함.
@@ -62,7 +105,7 @@ A project inspired by the popular Korean photo booth chain Life-4-Cuts. Users ca
 - Tailwind CSS + shadcn/ui (UI components)
 - Zustand (global state management)
 - html-to-image (DOM → PNG export)
-- gifenc (animated GIF generation)
+- gifenc (Web Worker-based animated GIF generation)
 - react-color (frame color picker)
 - qrcode.react (QR code display for shareable links)
 - Firebase Storage (cloud image upload for sharing)
@@ -86,6 +129,49 @@ A 6-step user flow:
 - `/s/:id` page includes Open Graph meta tags so the photo strip previews correctly when shared on social media or messengers
 - Share dialog displays a QR code — scan with camera to open the link directly
 - Rate-limited to 20 uploads per IP per day (Upstash Redis sliding window)
+
+## Testing
+
+### E2E Tests (Playwright)
+
+```bash
+pnpm test                        # Run all E2E tests
+pnpm test:ui                     # Interactive UI mode
+pnpm test:snapshots              # Run snapshot tests only
+pnpm test:update-snapshots       # Regenerate snapshot baselines
+```
+
+- Runs on Chromium only, against `localhost:3000` (requires `pnpm build && pnpm start`)
+- Test files: `tests/`
+- Coverage: landing, layout select, mode select, upload flow, edit page, GNB behaviour
+- Snapshot tests: key page states + a full real-upload E2E test for the share page (`/s/:id`)
+- Playwright MCP server configured in `~/.claude/settings.json` — Claude can control the browser directly in conversation
+
+### Unit Tests (Jest + React Testing Library)
+
+```bash
+pnpm test:unit                   # Run unit tests
+pnpm test:unit:watch             # Watch mode
+```
+
+- Test files: `src/__tests__/`
+- Coverage:
+  - `utils.test.ts` — `dataUrlToBlob`, `isMobile`, `isIosSafari` utility functions
+  - `store.test.ts` — Zustand store actions and state mutations
+  - `components.test.tsx` — `SelectOptionButton`, `SectionLabel`, `SliderControl`, `PhotoThumbnailGrid`, `PhotoOrPlaceholder`
+
+## Environment Variables
+
+Copy `.env.local.example` to `.env.local` and fill in the values:
+
+```bash
+cp .env.local.example .env.local
+```
+
+Required:
+- Firebase project config (`NEXT_PUBLIC_FIREBASE_*`)
+- Upstash Redis REST URL and token (`UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`)
+- Deployment domain (`NEXT_PUBLIC_BASE_URL`) — needed for absolute OG metadata URLs
 
 ## Known Issues / To-Do
 
