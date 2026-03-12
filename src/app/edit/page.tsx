@@ -40,6 +40,7 @@ import {
   downloadDataUrl,
   compressToTarget,
 } from "@/lib/export/toPng";
+import { isMobile } from "@/lib/export/utils";
 import { exportStripGif } from "@/lib/export/toGif";
 import type { FilterId, StickerType } from "@/types";
 import { cn } from "@/lib/utils";
@@ -252,14 +253,16 @@ function EditContent() {
   async function handleDownloadGif() {
     setGifLoading(true);
     try {
+      const photoWidth = config.photoWidth ?? layout.width;
       const blob = await exportStripGif(
         selectedPhotos,
         FILTER_CSS[config.filter],
+        photoWidth / layout.height,
       );
       const filename = "4-cut-life.gif";
       const file = new File([blob], filename, { type: "image/gif" });
 
-      if (navigator.canShare?.({ files: [file] })) {
+      if (isMobile && navigator.canShare?.({ files: [file] })) {
         await navigator.share({ files: [file], title: filename });
       } else {
         const url = URL.createObjectURL(blob);

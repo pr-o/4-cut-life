@@ -45,7 +45,6 @@ A web-based re-creation of Life-4-Cuts, a.k.a. "인생네컷".
 ## 개선할 점
 
 - [ ] 스티커 기능에서 SVG 드래그 앤 드롭이 일부 모바일 브라우저에서 불안정함.
-- [ ] GIF 인코딩이 메인 스레드에서 실행되어 큰 사진 세트에서 UI 블로킹 발생 가능. Web Worker로 분리 필요.
 - [ ] Firebase 클라이언트 SDK를 API 라우트에서 사용 중 → Firebase Admin SDK로 전환 권장.
 
 ---
@@ -91,5 +90,4 @@ A 6-step user flow:
 ## Known Issues / To-Do
 
 - [ ] Sticker drag-and-drop can be unstable on some mobile browsers.
-- [ ] GIF encoding runs on the main thread and may block the UI for large photo sets. Moving to a Web Worker is needed.
 - [ ] Firebase client SDK is used in the API route — migrating to Firebase Admin SDK is recommended for production.
