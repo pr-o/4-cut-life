@@ -11,7 +11,7 @@ export const isIosSafari =
 /** Converts a data URL to a Blob without using fetch() (which fails on iOS Safari) */
 export function dataUrlToBlob(dataUrl: string): Blob {
   const [header, base64] = dataUrl.split(",")
-  const mime = header.match(/:(.*?);/)?.[1] ?? "image/png"
+  const mime = header.match(/:(.*?);/)?.[1] || "image/png"
   const bytes = atob(base64)
   const arr = new Uint8Array(bytes.length)
   for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i)
