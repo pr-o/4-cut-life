@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "test": "playwright test",
-    "test:ui": "playwright test --ui"
+    "test:ui": "playwright test --ui",
+    "test:snapshots": "playwright test snapshots",
+    "test:update-snapshots": "playwright test snapshots --update-snapshots"
   },
   "dependencies": {
     "@upstash/ratelimit": "^2.0.8",
