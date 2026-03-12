@@ -55,10 +55,11 @@ const FRAME_COLORS = [
   "#bfdbfe",
   "#ddd6fe",
   "#fed7aa",
-  "#fecdd3",
   "#e0f2fe",
   "#ccfbf1",
   "#d9f99d",
+  "#006060",
+  "#008080",
 ];
 
 function EditContent() {
@@ -705,7 +706,6 @@ function EditContent() {
           )}
         </DialogContent>
       </Dialog>
-
     </main>
   );
 }
