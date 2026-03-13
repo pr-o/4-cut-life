@@ -99,6 +99,15 @@ function UploadContent() {
         size={96}
       />
 
+      {photos.length >= slotCount && (
+        <p className="text-xs text-muted-foreground text-center max-w-xs leading-relaxed">
+          On the next page you can{" "}
+          <strong className="text-foreground">drag each photo left or right</strong> to
+          adjust the crop, and <strong className="text-foreground">scroll (or pinch on mobile)</strong>{" "}
+          to zoom in or out.
+        </p>
+      )}
+
       <div className="flex gap-3">
         <GoBackButton href={ROUTES.modeSelect} />
         {photos.length >= slotCount && (

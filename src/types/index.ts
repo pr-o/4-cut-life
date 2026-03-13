@@ -30,6 +30,11 @@ export type Sticker = {
   rotate: number;
 };
 
+export type PhotoAdjustment = {
+  offsetX: number; // x-axis pan offset (px from center), clamped so image edge doesn't exceed slot
+  scale: number;   // user zoom multiplier on top of cover-scale; 1 = no extra zoom
+};
+
 export type StripConfig = {
   frameColor: string;
   frameWidth: number;
@@ -40,4 +45,5 @@ export type StripConfig = {
   stickers: Sticker[];
   showTimestamp: boolean;
   timestampText: string;
+  photoAdjustments?: PhotoAdjustment[]; // per slot, indexed by position
 };
