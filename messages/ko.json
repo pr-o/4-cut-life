@@ -1,0 +1,90 @@
+{
+  "landing": {
+    "title": "4-Cut Life",
+    "tagline": "네컷인생",
+    "description": "나만의 인생네컷 체험 — 사진을 찍고, 고르고, 완성된 컷을 다운로드하세요.",
+    "start": "시작하기"
+  },
+  "layoutSelect": {
+    "heading": "레이아웃을 선택하세요",
+    "subheading": "사진 배치 방식을 선택하세요.",
+    "continue": "계속하기"
+  },
+  "modeSelect": {
+    "heading": "사진을 어떻게 추가할까요?",
+    "cameraLabel": "사진 촬영",
+    "cameraDescription": "카운트다운 타이머로 카메라를 사용해 촬영하세요.",
+    "uploadLabel": "사진 업로드",
+    "uploadDescription": "기기에서 기존 사진을 선택하세요."
+  },
+  "instructions": {
+    "heading": "촬영 전 안내",
+    "body1": "각 촬영 전 카운트다운이 표시됩니다 — <strong>재촬영 없음</strong>.",
+    "body2": "컷에 필요한 개수보다 더 여러 번 촬영 후, 컷에 사용할 사진을 선택할 수 있습니다.",
+    "body3": "원하는 대로 컷을 꾸미고 <strong>다운로드하거나 공유</strong>할 수 있습니다.",
+    "pauseBetween": "촬영 간격",
+    "photoCountLabel": "촬영 매수",
+    "default": "기본값",
+    "continue": "계속하기"
+  },
+  "capture": {
+    "getReady": "준비하세요",
+    "allDone": "완료!",
+    "shooting": "촬영 중…",
+    "startShooting": "촬영 시작",
+    "continue": "계속하기",
+    "noCamera": "연결된 카메라를 찾을 수 없습니다. 사진 업로드를 선택해 주세요."
+  },
+  "select": {
+    "heading": "사진을 선택하세요",
+    "subheadingOne": "스트립에 넣을 순서대로 {required}장의 사진을 선택하세요.",
+    "subheadingMany": "스트립에 넣을 순서대로 {required}장의 사진을 선택하세요.",
+    "counter": "{selected} / {required}",
+    "continue": "계속하기"
+  },
+  "upload": {
+    "heading": "사진을 업로드하세요",
+    "subheading": "{cols}×{rows} 컷을 채우려면 <strong>최소 {slotCount}장의 사진</strong>을 업로드하세요.",
+    "choosePhotos": "클릭하여 사진 선택",
+    "photosSelectedOne": "{count}장 선택됨",
+    "photosSelectedMany": "{count}장 선택됨",
+    "minPhotosError": "{cols}×{rows} 컷을 채우려면 최소 {slotCount}장의 사진을 업로드해 주세요.",
+    "adjustTip": "다음 페이지에서 각 사진을 <strong>좌우로 드래그</strong>하여 크롭을 조정하고, <strong>스크롤(또는 모바일에서 두 손가락으로 핀치)</strong>하여 확대/축소할 수 있습니다.",
+    "continue": "계속하기"
+  },
+  "edit": {
+    "download": "다운로드",
+    "share": "공유",
+    "downloadGif": "GIF 다운로드",
+    "startAgain": "다시 시작",
+    "uploading": "업로드 중…",
+    "generating": "생성 중…",
+    "uploadingStrip": "컷 업로드 중…",
+    "resetDefaults": "기본값으로 초기화",
+    "deselectAll": "선택 해제",
+    "frameColor": "프레임 색상",
+    "photoWidth": "사진 너비",
+    "frameWidth": "프레임 너비",
+    "gap": "간격",
+    "horizontal": "가로",
+    "vertical": "세로",
+    "timestamp": "타임스탬프",
+    "filter": "필터",
+    "stickers": "스티커",
+    "clickToPlace": "— 컷 내부를 클릭하여 배치",
+    "remove": "삭제",
+    "shareConfirmTitle": "공유 전 안내",
+    "shareConfirmBody1": "컷이 <strong>클라우드에 업로드</strong>되며, 링크가 있는 누구나 보고 다운로드할 수 있습니다.",
+    "shareConfirmBody2": "링크는 <strong>30일</strong> 동안 유효하며, 이후 만료됩니다.",
+    "cancel": "취소",
+    "continue": "계속하기",
+    "shareResultTitle": "컷 공유",
+    "shareResultBody": "이 링크가 있는 누구나 향후 30일 동안 컷을 보고 다운로드할 수 있습니다. 카메라로 아래 QR 코드를 스캔하여 접근할 수도 있습니다.",
+    "copy": "복사",
+    "copied": "링크 복사됨!",
+    "downloadComplete": "다운로드 완료!"
+  },
+  "common": {
+    "goBack": "뒤로 가기"
+  }
+}

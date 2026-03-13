@@ -1,0 +1,90 @@
+{
+  "landing": {
+    "title": "4-Cut Life",
+    "tagline": "네컷인생",
+    "description": "Your own photo booth experience — capture, choose, and download your perfect photo strip.",
+    "start": "Start"
+  },
+  "layoutSelect": {
+    "heading": "Choose a layout",
+    "subheading": "Select how your photos will be arranged on the strip.",
+    "continue": "Continue"
+  },
+  "modeSelect": {
+    "heading": "How would you like to add photos?",
+    "cameraLabel": "Take photos",
+    "cameraDescription": "Use your camera to shoot photos with a countdown timer.",
+    "uploadLabel": "Upload photos",
+    "uploadDescription": "Pick existing photos from your device."
+  },
+  "instructions": {
+    "heading": "Before you shoot",
+    "body1": "A countdown will appear before each shot — <strong>no retakes</strong>.",
+    "body2": "You may shoot more photos than needed for the strip, then select which photos to use for your strip.",
+    "body3": "Then you may edit your strip and <strong>download or share</strong> your strip with friends.",
+    "pauseBetween": "Pause between shots",
+    "photoCountLabel": "Number of photos to take",
+    "default": "default",
+    "continue": "Continue"
+  },
+  "capture": {
+    "getReady": "Get ready",
+    "allDone": "All done!",
+    "shooting": "Shooting…",
+    "startShooting": "Start shooting",
+    "continue": "Continue",
+    "noCamera": "No camera found. Please choose to upload photos instead."
+  },
+  "select": {
+    "heading": "Choose your photos",
+    "subheadingOne": "Select {required} photo in the order you want them on the strip.",
+    "subheadingMany": "Select {required} photos in the order you want them on the strip.",
+    "counter": "{selected} / {required}",
+    "continue": "Continue"
+  },
+  "upload": {
+    "heading": "Upload your photos",
+    "subheading": "Upload at least <strong>{slotCount} photos</strong> to fill your {cols}×{rows} strip.",
+    "choosePhotos": "Click to choose photos",
+    "photosSelectedOne": "{count} photo selected",
+    "photosSelectedMany": "{count} photos selected",
+    "minPhotosError": "Please upload at least {slotCount} photos to fill your {cols}×{rows} strip.",
+    "adjustTip": "On the next page you can <strong>drag each photo left or right</strong> to adjust the crop, and <strong>scroll (or pinch on mobile)</strong> to zoom in or out.",
+    "continue": "Continue"
+  },
+  "edit": {
+    "download": "Download",
+    "share": "Share",
+    "downloadGif": "Download GIF",
+    "startAgain": "Start again",
+    "uploading": "Uploading…",
+    "generating": "Generating…",
+    "uploadingStrip": "Uploading your strip…",
+    "resetDefaults": "Reset to defaults",
+    "deselectAll": "Deselect all",
+    "frameColor": "Frame color",
+    "photoWidth": "Photo width",
+    "frameWidth": "Frame width",
+    "gap": "Gap",
+    "horizontal": "Horizontal",
+    "vertical": "Vertical",
+    "timestamp": "Timestamp",
+    "filter": "Filter",
+    "stickers": "Stickers",
+    "clickToPlace": "— click on the strip to place",
+    "remove": "Remove",
+    "shareConfirmTitle": "Before you share",
+    "shareConfirmBody1": "Your photo strip will be <strong>uploaded to the cloud</strong> and anyone with the link will be able to view and download it.",
+    "shareConfirmBody2": "The link will be available for <strong>30 days</strong>, after which it will expire.",
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "shareResultTitle": "Share your strip",
+    "shareResultBody": "Anyone with this link can view and download your photo strip for the next 30 days. You can also scan the QR code below with your camera to access.",
+    "copy": "Copy",
+    "copied": "Link copied!",
+    "downloadComplete": "Download complete!"
+  },
+  "common": {
+    "goBack": "Go back"
+  }
+}
