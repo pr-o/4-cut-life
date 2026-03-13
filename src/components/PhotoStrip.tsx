@@ -48,7 +48,10 @@ export default function PhotoStrip({
       }}
     >
       {/* App title */}
-      <div className="pb-1 text-center text-[10px] font-medium invert-50">
+      <div
+        className="pb-1 text-center font-medium invert-50"
+        style={{ fontSize: Math.round(photoWidth * 0.055), WebkitTextSizeAdjust: "100%" }}
+      >
         {APP_TITLE}
       </div>
 
@@ -75,7 +78,10 @@ export default function PhotoStrip({
 
       {/* Timestamp */}
       {showTimestamp && (
-        <div className="pt-1 text-center text-[10px] invert-50 tracking-wide">
+        <div
+          className="pt-1 text-center invert-50 tracking-wide"
+          style={{ fontSize: Math.round(photoWidth * 0.055), WebkitTextSizeAdjust: "100%" }}
+        >
           {timestampText}
         </div>
       )}
