@@ -1,26 +1,26 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react";
+import { useRouter } from "@/i18n/navigation";
 
 type Props = {
-  check: () => string | null   // return redirect path, or null if ok
-  children: React.ReactNode
-}
+  check: () => string | null; // return redirect path, or null if ok
+  children: React.ReactNode;
+};
 
 export default function NavigationGuard({ check, children }: Props) {
-  const router = useRouter()
-  const [allowed, setAllowed] = useState(false)
+  const router = useRouter();
+  const [allowed, setAllowed] = useState(false);
 
   useEffect(() => {
-    const redirect = check()
+    const redirect = check();
     if (redirect) {
-      router.replace(redirect)
+      router.replace(redirect);
     } else {
-      setAllowed(true)
+      setAllowed(true);
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (!allowed) return null
-  return <>{children}</>
+  if (!allowed) return null;
+  return <>{children}</>;
 }

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import NavigationGuard from "@/components/NavigationGuard";
 import GoBackButton from "@/components/GoBackButton";
@@ -9,6 +10,7 @@ import PhotoThumbnailGrid from "@/components/PhotoThumbnailGrid";
 import { usePhotoStore } from "@/store/usePhotoStore";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
+
 const CAPTURE_SIZE = 1080;
 
 function resizeToDataUrl(file: File): Promise<string> {
@@ -32,6 +34,7 @@ function resizeToDataUrl(file: File): Promise<string> {
 }
 
 function UploadContent() {
+  const t = useTranslations("upload");
   const router = useRouter();
   const layout = usePhotoStore((s) => s.layout)!;
   const setCapturedPhotos = usePhotoStore((s) => s.setCapturedPhotos);
@@ -44,9 +47,7 @@ function UploadContent() {
   async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
     if (files.length < slotCount) {
-      setError(
-        `Please upload at least ${slotCount} photos to fill your ${layout.cols}×${layout.rows} strip.`,
-      );
+      setError(t("minPhotosError", { slotCount, cols: layout.cols, rows: layout.rows }));
       return;
     }
     setError(null);
@@ -58,17 +59,20 @@ function UploadContent() {
     const selected = photos.slice(0, slotCount);
     setCapturedPhotos(photos);
     setSelectedPhotos(selected);
-    router.push("/edit");
+    router.push(ROUTES.edit);
   }
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center gap-8 px-6 py-12">
+    <main className="flex-1 flex flex-col items-center justify-center gap-8 px-6 py-12">
       <div className="text-center space-y-2">
-        <h1 className="text-2xl font-bold">Upload your photos</h1>
+        <h1 className="text-2xl font-bold">{t("heading")}</h1>
         <p className="text-sm text-muted-foreground">
-          Upload at least{" "}
-          <strong className="text-foreground">{slotCount} photos</strong> to
-          fill your {layout.cols}×{layout.rows} strip.
+          {t.rich("subheading", {
+            slotCount,
+            cols: layout.cols,
+            rows: layout.rows,
+            strong: (chunks) => <strong className="text-foreground">{chunks}</strong>,
+          })}
         </p>
       </div>
 
@@ -80,8 +84,10 @@ function UploadContent() {
         )}
       >
         {photos.length > 0
-          ? `${photos.length} photo${photos.length > 1 ? "s" : ""} selected`
-          : "Click to choose photos"}
+          ? photos.length === 1
+            ? t("photosSelectedOne", { count: photos.length })
+            : t("photosSelectedMany", { count: photos.length })
+          : t("choosePhotos")}
         <input
           type="file"
           accept="image/*"
@@ -101,10 +107,9 @@ function UploadContent() {
 
       {photos.length >= slotCount && (
         <p className="text-xs text-muted-foreground text-center max-w-xs leading-relaxed">
-          On the next page you can{" "}
-          <strong className="text-foreground">drag each photo left or right</strong> to
-          adjust the crop, and <strong className="text-foreground">scroll (or pinch on mobile)</strong>{" "}
-          to zoom in or out.
+          {t.rich("adjustTip", {
+            strong: (chunks) => <strong className="text-foreground">{chunks}</strong>,
+          })}
         </p>
       )}
 
@@ -112,7 +117,7 @@ function UploadContent() {
         <GoBackButton href={ROUTES.modeSelect} />
         {photos.length >= slotCount && (
           <Button size="lg" className="px-12" onClick={handleContinue}>
-            Continue
+            {t("continue")}
           </Button>
         )}
       </div>
@@ -126,8 +131,8 @@ export default function UploadPage() {
   return (
     <NavigationGuard
       check={() => {
-        if (!layout) return "/layout-select";
-        if (shootingMode !== "upload") return "/mode-select";
+        if (!layout) return ROUTES.layoutSelect;
+        if (shootingMode !== "upload") return ROUTES.modeSelect;
         return null;
       }}
     >

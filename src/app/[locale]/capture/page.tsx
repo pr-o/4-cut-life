@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import NavigationGuard from "@/components/NavigationGuard";
 import GoBackButton from "@/components/GoBackButton";
@@ -15,6 +16,7 @@ type CaptureState = "idle" | "countdown" | "flash" | "done";
 const CAPTURE_SIZE = 1080;
 
 function CameraCapture() {
+  const t = useTranslations("capture");
   const router = useRouter();
   const layout = usePhotoStore((s) => s.layout)!;
   const countdownSeconds = usePhotoStore((s) => s.countdownSeconds);
@@ -47,14 +49,14 @@ function CameraCapture() {
         if (videoRef.current) videoRef.current.srcObject = stream;
       })
       .catch(() => {
-        toast.error("No camera found. Please choose to upload photos instead.");
-        router.replace("/mode-select");
+        toast.error(t("noCamera"));
+        router.replace(ROUTES.modeSelect);
       });
 
     return () => {
-      streamRef.current?.getTracks().forEach((t) => t.stop());
+      streamRef.current?.getTracks().forEach((track) => track.stop());
     };
-  }, [router]);
+  }, [router, t]);
 
   const captureFrame = useCallback((): string => {
     const video = videoRef.current!;
@@ -80,8 +82,8 @@ function CameraCapture() {
 
     for (let i = 0; i < totalShots; i++) {
       setCaptureState("countdown");
-      for (let t = countdownSeconds; t > 0; t--) {
-        setCountdown(t);
+      for (let tick = countdownSeconds; tick > 0; tick--) {
+        setCountdown(tick);
         await new Promise((r) => setTimeout(r, 1000));
       }
       setCaptureState("flash");
@@ -98,13 +100,13 @@ function CameraCapture() {
   function handleContinue() {
     setCapturedPhotos(photos);
     setSelectedPhotos(photos.slice(0, slotCount));
-    router.push("/edit");
+    router.push(ROUTES.edit);
   }
 
   return (
-    <main className="min-h-screen flex flex-col items-center gap-8 px-6 py-12">
+    <main className="flex-1 flex flex-col items-center gap-8 px-6 py-12">
       <h1 className="text-2xl font-bold">
-        {captureState === "done" ? "All done!" : "Get ready"}
+        {captureState === "done" ? t("allDone") : t("getReady")}
       </h1>
 
       <div className="relative w-full max-w-sm aspect-square rounded-2xl overflow-hidden bg-black">
@@ -143,14 +145,16 @@ function CameraCapture() {
             onClick={runShootingSession}
             disabled={shooting}
           >
-            {shooting ? "Shooting…" : "Start shooting"}
+            {shooting ? t("shooting") : t("startShooting")}
           </Button>
         )}
         {captureState === "done" && (
           <div className="flex gap-3 w-full">
-            <div className="flex-1"><GoBackButton href={ROUTES.instructions} /></div>
+            <div className="flex-1">
+              <GoBackButton href={ROUTES.instructions} />
+            </div>
             <Button size="lg" className="flex-1" onClick={handleContinue}>
-              Continue
+              {t("continue")}
             </Button>
           </div>
         )}
@@ -165,8 +169,8 @@ export default function CapturePage() {
   return (
     <NavigationGuard
       check={() => {
-        if (!layout) return "/layout-select";
-        if (shootingMode !== "camera") return "/mode-select";
+        if (!layout) return ROUTES.layoutSelect;
+        if (shootingMode !== "camera") return ROUTES.modeSelect;
         return null;
       }}
     >

@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/navigation";
 import { QRCodeSVG } from "qrcode.react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,6 +46,7 @@ import { exportStripGif } from "@/lib/export/toGif";
 import type { FilterId, StickerType } from "@/types";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { ROUTES } from "@/lib/routes";
 
 const FRAME_COLORS = [
   "#000000",
@@ -63,6 +65,7 @@ const FRAME_COLORS = [
 ];
 
 function EditContent() {
+  const t = useTranslations("edit");
   const router = useRouter();
   const stripRef = useRef<HTMLDivElement>(null);
   const stripWrapperRef = useRef<HTMLDivElement>(null);
@@ -94,14 +97,12 @@ function EditContent() {
   const ZOOM_MIN = 1 / 3;
   const ZOOM_MAX = 3;
 
-  // Default to 150% on medium+ screens
   useEffect(() => {
     if (window.innerWidth >= 768) setZoom(1.25);
   }, []);
 
   const required = layout.cols * layout.rows;
 
-  // Pad selectedPhotos to always fill all strip slots (empty string = placeholder)
   const photosForStrip = [
     ...selectedPhotos,
     ...Array(Math.max(0, required - selectedPhotos.length)).fill(""),
@@ -116,9 +117,6 @@ function EditContent() {
     }
   }
 
-
-  // Keep stickers visually anchored when dimensions change.
-  // Grid expands symmetrically from center, so shift by half the total expansion.
   const prevPhotoWidthRef = useRef(config.photoWidth ?? layout.width);
   useEffect(() => {
     const current = config.photoWidth ?? layout.width;
@@ -138,7 +136,6 @@ function EditContent() {
     const prev = prevGapXRef.current;
     if (current !== prev && config.stickers.length > 0) {
       const delta = current - prev;
-      // (cols - 1) gaps expand the grid; shift by half the total expansion
       config.stickers.forEach((s) =>
         updateSticker(s.id, { x: s.x + ((layout.cols - 1) * delta) / 2 }),
       );
@@ -168,7 +165,6 @@ function EditContent() {
   const [gnbMounted, setGnbMounted] = useState(false);
   useEffect(() => setGnbMounted(true), []);
 
-  // Track mouse for sticker follower
   useEffect(() => {
     if (!activeStickerType) return;
     const onMove = (e: MouseEvent) =>
@@ -177,7 +173,6 @@ function EditContent() {
     return () => document.removeEventListener("mousemove", onMove);
   }, [activeStickerType]);
 
-  // Deactivate when clicking outside strip and sticker picker
   useEffect(() => {
     if (!activeStickerType) return;
     const onClick = (e: MouseEvent) => {
@@ -212,7 +207,7 @@ function EditContent() {
   async function handleDownloadPng() {
     const dataUrl = await getPngDataUrl();
     await downloadDataUrl(dataUrl, "4-cut-life.png");
-    toast.success("Download complete!");
+    toast.success(t("downloadComplete"));
   }
 
   function handleShare() {
@@ -224,9 +219,7 @@ function EditContent() {
     setShareLoading(true);
     try {
       const dataUrl = await getPngDataUrl();
-
       const compressed = await compressToTarget(dataUrl);
-
       const formData = new FormData();
       formData.append("image", compressed, "strip.jpg");
 
@@ -284,7 +277,7 @@ function EditContent() {
   }
 
   function handleStartAgain() {
-    router.replace("/layout-select");
+    router.replace(ROUTES.layoutSelect);
     setTimeout(() => reset(), 50);
   }
 
@@ -293,7 +286,7 @@ function EditContent() {
     : null;
 
   return (
-    <main className="min-h-screen flex flex-col">
+    <main className="flex-1 flex flex-col">
       {/* Sticker cursor follower */}
       {activeStickerType && ActiveStickerIcon && (
         <div
@@ -320,7 +313,7 @@ function EditContent() {
           }}
         >
           <div className="w-10 h-10 border-4 border-border border-t-primary rounded-full animate-spin" />
-          <p className="text-sm text-muted-foreground">Uploading your strip…</p>
+          <p className="text-sm text-muted-foreground">{t("uploadingStrip")}</p>
         </div>
       )}
 
@@ -330,7 +323,7 @@ function EditContent() {
         createPortal(
           <>
             <Button size="sm" onClick={handleDownloadPng}>
-              Download
+              {t("download")}
             </Button>
             <Button
               size="sm"
@@ -338,7 +331,7 @@ function EditContent() {
               onClick={handleShare}
               disabled={shareLoading}
             >
-              {shareLoading ? "Uploading…" : "Share"}
+              {shareLoading ? t("uploading") : t("share")}
             </Button>
             <Button
               size="sm"
@@ -346,10 +339,10 @@ function EditContent() {
               onClick={handleDownloadGif}
               disabled={gifLoading}
             >
-              {gifLoading ? "Generating…" : "Download GIF"}
+              {gifLoading ? t("generating") : t("downloadGif")}
             </Button>
             <Button size="sm" variant="ghost" onClick={handleStartAgain}>
-              Start again
+              {t("startAgain")}
             </Button>
           </>,
           document.getElementById("gnb-portal")!,
@@ -374,7 +367,9 @@ function EditContent() {
               config={config}
               stripRef={stripRef}
               className="shadow-xl"
-              onAdjustPhoto={!activeStickerType ? setPhotoAdjustment : undefined}
+              onAdjustPhoto={
+                !activeStickerType ? setPhotoAdjustment : undefined
+              }
             />
             <StickerOverlay
               stickers={config.stickers}
@@ -415,7 +410,7 @@ function EditContent() {
           </div>
         </div>
 
-        {/* Middle — thumbnail rail (only when there are more photos than slots) */}
+        {/* Middle — thumbnail rail */}
         {capturedPhotos.length > 0 && (
           <div className="flex flex-row lg:flex-col gap-2 p-2 place-items-center overflow-auto border-l border-[#bbb] bg-background lg:w-24">
             <button
@@ -423,7 +418,7 @@ function EditContent() {
               disabled={selectedPhotos.length === 0}
               className="shrink-0 text-[10px] text-foreground border border-border rounded px-1.5 py-1 hover:border-destructive hover:text-destructive transition-colors disabled:opacity-30 disabled:pointer-events-none"
             >
-              Deselect all
+              {t("deselectAll")}
             </button>
             {capturedPhotos.map((src, i) => (
               <SelectablePhotoThumbnail
@@ -440,7 +435,7 @@ function EditContent() {
         )}
 
         {/* Right — controls */}
-        <aside className="w-full lg:w-80 border-l border-[#bbb] overflow-y-auto p-6 space-y-8">
+        <aside className="w-full lg:w-80 border-l border-[#bbb] overflow-y-auto p-6 space-y-6">
           {/* Reset controls */}
           <div className="flex justify-center">
             <Button
@@ -459,13 +454,13 @@ function EditContent() {
                 clearPhotoAdjustments();
               }}
             >
-              Reset to defaults
+              {t("resetDefaults")}
             </Button>
           </div>
 
           {/* Frame color */}
           <section className="space-y-3">
-            <SectionLabel>Frame color</SectionLabel>
+            <SectionLabel>{t("frameColor")}</SectionLabel>
             <BlockPicker
               triangle="hide"
               width="100%"
@@ -476,7 +471,7 @@ function EditContent() {
           </section>
 
           <SliderControl
-            label="Photo width"
+            label={t("photoWidth")}
             value={config.photoWidth ?? layout.width}
             min={layout.width}
             max={layout.height}
@@ -485,7 +480,7 @@ function EditContent() {
           />
 
           <SliderControl
-            label="Frame width"
+            label={t("frameWidth")}
             value={config.frameWidth}
             min={FRAME_WIDTH_MIN}
             max={FRAME_WIDTH_MAX}
@@ -495,10 +490,10 @@ function EditContent() {
 
           {/* Gap X / Y */}
           <section className="space-y-3">
-            <SectionLabel>Gap</SectionLabel>
+            <SectionLabel>{t("gap")}</SectionLabel>
             <div className="space-y-2">
               <SliderControl
-                label="Horizontal"
+                label={t("horizontal")}
                 value={config.gapX}
                 min={GAP_MIN}
                 max={GAP_MAX}
@@ -506,7 +501,7 @@ function EditContent() {
                 onChange={setGapX}
               />
               <SliderControl
-                label="Vertical"
+                label={t("vertical")}
                 value={config.gapY}
                 min={GAP_MIN}
                 max={GAP_MAX}
@@ -519,7 +514,7 @@ function EditContent() {
           {/* Timestamp */}
           <section className="space-y-3">
             <div className="flex items-center justify-between">
-              <SectionLabel>Timestamp</SectionLabel>
+              <SectionLabel>{t("timestamp")}</SectionLabel>
               <button
                 onClick={() => {
                   const turningOn = !config.showTimestamp;
@@ -561,7 +556,7 @@ function EditContent() {
 
           {/* Filter */}
           <section className="space-y-3">
-            <SectionLabel>Filter</SectionLabel>
+            <SectionLabel>{t("filter")}</SectionLabel>
             <div className="grid grid-cols-3 gap-2">
               {(Object.keys(FILTER_LABELS) as FilterId[])
                 .filter((id) => id !== "none")
@@ -583,10 +578,10 @@ function EditContent() {
           {/* Stickers */}
           <section className="space-y-3" ref={stickerPickerRef}>
             <SectionLabel>
-              Stickers
+              {t("stickers")}
               {activeStickerType && (
                 <span className="ml-2 normal-case text-primary">
-                  — click on the strip to place
+                  {t("clickToPlace")}
                 </span>
               )}
             </SectionLabel>
@@ -631,7 +626,7 @@ function EditContent() {
                         onClick={() => removeSticker(sticker.id)}
                         className="hover:text-destructive transition-colors"
                       >
-                        Remove
+                        {t("remove")}
                       </button>
                     </div>
                   );
@@ -646,17 +641,21 @@ function EditContent() {
       <Dialog open={shareConfirmOpen} onOpenChange={setShareConfirmOpen}>
         <DialogContent className="max-w-sm space-y-4">
           <DialogHeader>
-            <DialogTitle>Before you share</DialogTitle>
+            <DialogTitle>{t("shareConfirmTitle")}</DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            Your photo strip will be{" "}
-            <strong className="text-foreground">uploaded to the cloud</strong>{" "}
-            and anyone with the link will be able to view and download it.
+            {t.rich("shareConfirmBody1", {
+              strong: (chunks) => (
+                <strong className="text-foreground">{chunks}</strong>
+              ),
+            })}
           </p>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            The link will be available for{" "}
-            <strong className="text-foreground">30 days</strong>, after which it
-            will expire.
+            {t.rich("shareConfirmBody2", {
+              strong: (chunks) => (
+                <strong className="text-foreground">{chunks}</strong>
+              ),
+            })}
           </p>
           <div className="flex gap-2 pt-1">
             <Button
@@ -664,10 +663,10 @@ function EditContent() {
               className="flex-1"
               onClick={() => setShareConfirmOpen(false)}
             >
-              Cancel
+              {t("cancel")}
             </Button>
             <Button className="flex-1" onClick={handleShareConfirm}>
-              Continue
+              {t("continue")}
             </Button>
           </div>
         </DialogContent>
@@ -681,12 +680,10 @@ function EditContent() {
           onEscapeKeyDown={(e) => e.preventDefault()}
         >
           <DialogHeader>
-            <DialogTitle>Share your strip</DialogTitle>
+            <DialogTitle>{t("shareResultTitle")}</DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground">
-            Anyone with this link can view and download your photo strip for the
-            next 30 days. You can also scan the QR code below with your camera
-            to access.
+            {t("shareResultBody")}
           </p>
           <div className="flex gap-2">
             <input
@@ -698,10 +695,10 @@ function EditContent() {
               size="lg"
               onClick={() => {
                 if (shareUrl) navigator.clipboard.writeText(shareUrl);
-                toast.success("Link copied!");
+                toast.success(t("copied"));
               }}
             >
-              Copy
+              {t("copy")}
             </Button>
           </div>
           {shareUrl && (
@@ -721,8 +718,8 @@ export default function EditPage() {
   return (
     <NavigationGuard
       check={() => {
-        if (!layout) return "/layout-select";
-        if (capturedPhotos.length === 0) return "/mode-select";
+        if (!layout) return ROUTES.layoutSelect;
+        if (capturedPhotos.length === 0) return ROUTES.modeSelect;
         return null;
       }}
     >

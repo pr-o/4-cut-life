@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import GoBackButton from "@/components/GoBackButton";
 import { usePhotoStore } from "@/store/usePhotoStore";
@@ -42,6 +43,7 @@ function LayoutPreview({ cols, rows, width, height }: Layout) {
 }
 
 export default function LayoutSelectPage() {
+  const t = useTranslations("layoutSelect");
   const router = useRouter();
   const setLayout = usePhotoStore((s) => s.setLayout);
   const [selected, setSelected] = useState<Layout | null>(null);
@@ -49,16 +51,14 @@ export default function LayoutSelectPage() {
   function handleContinue() {
     if (!selected) return;
     setLayout(selected);
-    router.push("/mode-select");
+    router.push(ROUTES.modeSelect);
   }
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center gap-10 px-6 py-16">
+    <main className="flex-1 flex flex-col items-center justify-center gap-10 px-6 py-16">
       <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold">Choose a layout</h1>
-        <p className="text-muted-foreground text-sm">
-          Select how your photos will be arranged on the strip.
-        </p>
+        <h1 className="text-3xl font-bold">{t("heading")}</h1>
+        <p className="text-muted-foreground text-sm">{t("subheading")}</p>
       </div>
 
       <div className="grid grid-cols-3 gap-4">
@@ -80,8 +80,7 @@ export default function LayoutSelectPage() {
                 cols={layout.cols}
                 rows={layout.rows}
                 width={layout.width}
-                height={layout.width} // square looks prettier
-                // height={layout.height}
+                height={layout.width}
               />
               <span className="text-sm font-medium">
                 {layout.cols}×{layout.rows}
@@ -98,7 +97,7 @@ export default function LayoutSelectPage() {
           disabled={!selected}
           onClick={handleContinue}
         >
-          Continue
+          {t("continue")}
         </Button>
       </div>
     </main>

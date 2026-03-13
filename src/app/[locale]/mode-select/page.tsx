@@ -1,6 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/navigation";
 import { Camera, ImageUp } from "lucide-react";
 import NavigationGuard from "@/components/NavigationGuard";
 import GoBackButton from "@/components/GoBackButton";
@@ -9,55 +10,46 @@ import { ROUTES } from "@/lib/routes";
 import type { ShootingMode } from "@/store/usePhotoStore";
 import { cn } from "@/lib/utils";
 
-const MODES: {
-  mode: ShootingMode;
-  label: string;
-  description: string;
-  icon: React.ReactNode;
-}[] = [
-  {
-    mode: "camera",
-    label: "Take photos",
-    description: "Use your camera to shoot photos with a countdown timer.",
-    icon: <Camera size={32} strokeWidth={1.5} />,
-  },
-  {
-    mode: "upload",
-    label: "Upload photos",
-    description: "Pick existing photos from your device.",
-    icon: <ImageUp size={32} strokeWidth={1.5} />,
-  },
-];
-
 function ModeSelectContent() {
+  const t = useTranslations("modeSelect");
   const router = useRouter();
   const setShootingMode = usePhotoStore((s) => s.setShootingMode);
 
+  const modes: { mode: ShootingMode; label: string; description: string; icon: React.ReactNode }[] = [
+    {
+      mode: "camera",
+      label: t("cameraLabel"),
+      description: t("cameraDescription"),
+      icon: <Camera size={32} strokeWidth={1.5} />,
+    },
+    {
+      mode: "upload",
+      label: t("uploadLabel"),
+      description: t("uploadDescription"),
+      icon: <ImageUp size={32} strokeWidth={1.5} />,
+    },
+  ];
+
   function handleSelect(mode: ShootingMode) {
     setShootingMode(mode);
-
     switch (mode) {
       case "camera":
-        router.push("/instructions");
+        router.push(ROUTES.instructions);
         break;
       case "upload":
-        router.push("/upload");
-        break;
-      default:
+        router.push(ROUTES.upload);
         break;
     }
   }
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center gap-10 px-6 py-16">
+    <main className="flex-1 flex flex-col items-center justify-center gap-10 px-6 py-16">
       <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold">
-          How would you like to add photos?
-        </h1>
+        <h1 className="text-3xl font-bold">{t("heading")}</h1>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
-        {MODES.map(({ mode, label, description, icon }) => (
+        {modes.map(({ mode, label, description, icon }) => (
           <button
             key={mode}
             onClick={() => handleSelect(mode)}
@@ -81,7 +73,7 @@ function ModeSelectContent() {
 export default function ModeSelectPage() {
   const layout = usePhotoStore((s) => s.layout);
   return (
-    <NavigationGuard check={() => (!layout ? "/layout-select" : null)}>
+    <NavigationGuard check={() => (!layout ? ROUTES.layoutSelect : null)}>
       <ModeSelectContent />
     </NavigationGuard>
   );

@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { DEFAULT_STRIP_CONFIG } from "@/lib/constants";
 
@@ -71,16 +72,15 @@ function ExampleStrip({
 }
 
 export default function LandingPage() {
+  const t = useTranslations("landing");
+
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center gap-12 px-6 py-16">
+    <main className="flex-1 flex flex-col items-center justify-center gap-12 px-6 py-16">
       {/* Hero */}
       <div className="text-center space-y-3">
-        <p className="text-5xl font-bold tracking-widest uppercase">네컷인생</p>
-        <h1 className="text-5xl font-bold tracking-wide">4-Cut Life</h1>
-        <p className="text-muted-foreground max-w-sm mx-auto">
-          Your own photo booth experience — capture, choose, and download your
-          perfect photo strip.
-        </p>
+        <p className="text-5xl font-bold tracking-widest uppercase">{t("tagline")}</p>
+        <h1 className="text-5xl font-bold tracking-wide">{t("title")}</h1>
+        <p className="text-muted-foreground max-w-sm mx-auto">{t("description")}</p>
       </div>
 
       {/* Example strips gallery */}
@@ -93,7 +93,7 @@ export default function LandingPage() {
       </div>
 
       <Button asChild size="lg" className="px-12 text-base">
-        <Link href="/layout-select">Start</Link>
+        <Link href="/layout-select">{t("start")}</Link>
       </Button>
     </main>
   );
