@@ -16,6 +16,7 @@ A web-based re-creation of Life-4-Cuts, a.k.a. "인생네컷".
 - TypeScript (타입 안전성)
 - Tailwind CSS + shadcn/ui (UI 컴포넌트)
 - Zustand (전역 상태 관리)
+- next-intl (한국어/영어 다국어 지원)
 - html-to-image (DOM → PNG 내보내기)
 - gifenc (Web Worker 기반 애니메이션 GIF 생성)
 - react-color (프레임 색상 선택기)
@@ -31,7 +32,7 @@ A web-based re-creation of Life-4-Cuts, a.k.a. "인생네컷".
 2. **레이아웃 선택 (`/layout-select`)**: 1×2, 1×3, 1×4, 2×2, 2×3, 2×4 중 레이아웃 선택
 3. **모드 선택 (`/mode-select`)**: 카메라 촬영 또는 사진 업로드 선택
 4. **촬영 설정 및 촬영 (`/instructions`, `/capture`)**: 카메라 선택 시 촬영 간격 및 사진 수 설정 후 카운트다운과 함께 자동 연속 촬영. 업로드 선택 시 `/upload`로 이동하여 파일 선택.
-5. **편집 (`/edit`)**: 프레임 색상·너비, 사진 너비, 간격, 필터, 스티커, 타임스탬프 등 커스터마이징. 썸네일 레일에서 사진 선택 및 순서 변경.
+5. **편집 (`/edit`)**: 프레임 색상·너비, 사진 너비, 간격, 필터, 스티커, 타임스탬프 등 커스터마이징. 썸네일 레일에서 사진 선택 및 순서 변경. 각 사진 슬롯을 드래그(또는 모바일에서 터치)하여 상하좌우로 이동하거나, 스크롤(또는 모바일에서 핀치)로 확대·축소하여 크롭 위치를 조정할 수 있음.
 6. **내보내기**: PNG 다운로드, GIF 다운로드, 클라우드 업로드 후 공유 링크 생성
 
 ## 공유 기능
@@ -81,6 +82,7 @@ cp .env.local.example .env.local
 ```
 
 필요한 값:
+
 - Firebase 프로젝트 설정 (`NEXT_PUBLIC_FIREBASE_*`)
 - Upstash Redis REST URL 및 토큰 (`UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`)
 - 배포 도메인 (`NEXT_PUBLIC_BASE_URL`) — OG 메타태그 절대 URL 생성에 필요
@@ -104,6 +106,7 @@ A project inspired by the popular Korean photo booth chain Life-4-Cuts. Users ca
 - TypeScript (type safety)
 - Tailwind CSS + shadcn/ui (UI components)
 - Zustand (global state management)
+- next-intl (Korean/English i18n)
 - html-to-image (DOM → PNG export)
 - gifenc (Web Worker-based animated GIF generation)
 - react-color (frame color picker)
@@ -119,7 +122,7 @@ A 6-step user flow:
 2. **Layout selection (`/layout-select`)**: Choose from 1×2, 1×3, 1×4, 2×2, 2×3, 2×4
 3. **Mode selection (`/mode-select`)**: Choose between camera capture or photo upload
 4. **Shoot settings & capture (`/instructions`, `/capture`)**: For camera mode, set countdown interval and number of shots, then auto-capture with countdown. For upload mode, navigate to `/upload` and select files.
-5. **Editing (`/edit`)**: Customize frame color/width, photo width, gaps, filters, stickers, and timestamp. Select and reorder photos via the thumbnail rail.
+5. **Editing (`/edit`)**: Customize frame color/width, photo width, gaps, filters, stickers, and timestamp. Select and reorder photos via the thumbnail rail. Drag (or touch on mobile) each photo slot to pan in any direction, or scroll (or pinch on mobile) to zoom in and adjust the crop — independently per slot.
 6. **Export**: Download PNG, download GIF, or upload to cloud and generate a shareable link
 
 ## Share Feature
@@ -169,6 +172,7 @@ cp .env.local.example .env.local
 ```
 
 Required:
+
 - Firebase project config (`NEXT_PUBLIC_FIREBASE_*`)
 - Upstash Redis REST URL and token (`UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`)
 - Deployment domain (`NEXT_PUBLIC_BASE_URL`) — needed for absolute OG metadata URLs
