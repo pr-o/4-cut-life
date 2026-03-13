@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ChevronsLeftRightEllipsis } from "lucide-react";
+import { Move } from "lucide-react";
 import PhotoImg from "@/components/PhotoImg";
 
-type Adjustment = { offsetX: number; scale: number };
+type Adjustment = { offsetX: number; offsetY: number; scale: number };
 
 type Props = {
   src: string;
@@ -36,6 +36,7 @@ export default function PhotoOrPlaceholder({
   const [isDragging, setIsDragging] = useState(false);
 
   const offsetX = adjustment?.offsetX ?? 0;
+  const offsetY = adjustment?.offsetY ?? 0;
   const userScale = adjustment?.scale ?? 1;
 
   // Cover scale: minimum scale to fill the slot with the natural image
@@ -43,31 +44,46 @@ export default function PhotoOrPlaceholder({
     ? Math.max(width / naturalSize.w, height / naturalSize.h)
     : null;
 
-  // base display size at scale=1 (just covers slot)
+  // Base display size at scale=1 (just covers slot)
   const baseW = coverScale !== null && naturalSize ? naturalSize.w * coverScale : null;
+  const baseH = coverScale !== null && naturalSize ? naturalSize.h * coverScale : null;
 
   // Final display dimensions including user zoom
   const finalW = baseW !== null ? baseW * userScale : null;
-  const finalH = coverScale !== null && naturalSize ? naturalSize.h * coverScale * userScale : null;
-  const maxOffset = finalW !== null ? Math.max(0, (finalW - width) / 2) : 0;
-  const clampedOffsetX = clamp(offsetX, -maxOffset, maxOffset);
+  const finalH = baseH !== null ? baseH * userScale : null;
+
+  const maxOffsetX = finalW !== null ? Math.max(0, (finalW - width) / 2) : 0;
+  const maxOffsetY = finalH !== null ? Math.max(0, (finalH - height) / 2) : 0;
+
+  const clampedOffsetX = clamp(offsetX, -maxOffsetX, maxOffsetX);
+  const clampedOffsetY = clamp(offsetY, -maxOffsetY, maxOffsetY);
+
   const isInteractive = onAdjust !== undefined && naturalSize !== null;
+  const canPan = maxOffsetX > 0 || maxOffsetY > 0;
 
   const [hintDone, setHintDone] = useState(false);
-  const showHint = isInteractive && maxOffset > 0 && !hintDone;
+  const showHint = isInteractive && canPan && !hintDone;
 
   // Refs so wheel + pointer handlers always see fresh values without re-registering
   const baseWRef = useRef(baseW);
-  const maxOffsetRef = useRef(maxOffset);
+  const baseHRef = useRef(baseH);
+  const maxOffsetXRef = useRef(maxOffsetX);
+  const maxOffsetYRef = useRef(maxOffsetY);
   const clampedOffsetXRef = useRef(clampedOffsetX);
+  const clampedOffsetYRef = useRef(clampedOffsetY);
   const userScaleRef = useRef(userScale);
   const widthRef = useRef(width);
+  const heightRef = useRef(height);
   const onAdjustRef = useRef(onAdjust);
   useEffect(() => { baseWRef.current = baseW; }, [baseW]);
-  useEffect(() => { maxOffsetRef.current = maxOffset; }, [maxOffset]);
+  useEffect(() => { baseHRef.current = baseH; }, [baseH]);
+  useEffect(() => { maxOffsetXRef.current = maxOffsetX; }, [maxOffsetX]);
+  useEffect(() => { maxOffsetYRef.current = maxOffsetY; }, [maxOffsetY]);
   useEffect(() => { clampedOffsetXRef.current = clampedOffsetX; }, [clampedOffsetX]);
+  useEffect(() => { clampedOffsetYRef.current = clampedOffsetY; }, [clampedOffsetY]);
   useEffect(() => { userScaleRef.current = userScale; }, [userScale]);
   useEffect(() => { widthRef.current = width; }, [width]);
+  useEffect(() => { heightRef.current = height; }, [height]);
   useEffect(() => { onAdjustRef.current = onAdjust; }, [onAdjust]);
 
   // Non-passive wheel listener (desktop zoom — must preventDefault to block page scroll)
@@ -75,14 +91,15 @@ export default function PhotoOrPlaceholder({
     const el = containerRef.current;
     if (!el) return;
     function handleWheel(e: WheelEvent) {
-      if (!onAdjustRef.current || baseWRef.current === null) return;
+      if (!onAdjustRef.current || baseWRef.current === null || baseHRef.current === null) return;
       e.preventDefault();
       const newScale = clamp(userScaleRef.current * Math.pow(0.999, e.deltaY), 1, MAX_SCALE);
-      const newFinalW = baseWRef.current * newScale;
-      const newMaxOffset = Math.max(0, (newFinalW - widthRef.current) / 2);
+      const newMaxOffsetX = Math.max(0, (baseWRef.current * newScale - widthRef.current) / 2);
+      const newMaxOffsetY = Math.max(0, (baseHRef.current * newScale - heightRef.current) / 2);
       onAdjustRef.current({
         scale: newScale,
-        offsetX: clamp(clampedOffsetXRef.current, -newMaxOffset, newMaxOffset),
+        offsetX: clamp(clampedOffsetXRef.current, -newMaxOffsetX, newMaxOffsetX),
+        offsetY: clamp(clampedOffsetYRef.current, -newMaxOffsetY, newMaxOffsetY),
       });
     }
     el.addEventListener("wheel", handleWheel, { passive: false });
@@ -91,7 +108,10 @@ export default function PhotoOrPlaceholder({
 
   // Multi-pointer tracking for drag (1 finger) + pinch-to-zoom (2 fingers)
   const pointersRef = useRef<Map<number, { x: number; y: number }>>(new Map());
-  const dragBaseRef = useRef<{ startClientX: number; startOffsetX: number } | null>(null);
+  const dragBaseRef = useRef<{
+    startClientX: number; startOffsetX: number;
+    startClientY: number; startOffsetY: number;
+  } | null>(null);
   const pinchBaseRef = useRef<{ dist: number; startScale: number } | null>(null);
 
   function onPointerDown(e: React.PointerEvent<HTMLDivElement>) {
@@ -100,7 +120,10 @@ export default function PhotoOrPlaceholder({
     pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
     if (pointersRef.current.size === 1) {
-      dragBaseRef.current = { startClientX: e.clientX, startOffsetX: clampedOffsetX };
+      dragBaseRef.current = {
+        startClientX: e.clientX, startOffsetX: clampedOffsetX,
+        startClientY: e.clientY, startOffsetY: clampedOffsetY,
+      };
       pinchBaseRef.current = null;
       setIsDragging(true);
     } else if (pointersRef.current.size === 2) {
@@ -121,20 +144,24 @@ export default function PhotoOrPlaceholder({
       const rect = containerRef.current.getBoundingClientRect();
       const scaleFactor = widthRef.current / rect.width;
       const dx = (e.clientX - dragBaseRef.current.startClientX) * scaleFactor;
+      const dy = (e.clientY - dragBaseRef.current.startClientY) * scaleFactor;
       onAdjustRef.current?.({
-        offsetX: clamp(dragBaseRef.current.startOffsetX + dx, -maxOffsetRef.current, maxOffsetRef.current),
+        offsetX: clamp(dragBaseRef.current.startOffsetX + dx, -maxOffsetXRef.current, maxOffsetXRef.current),
+        offsetY: clamp(dragBaseRef.current.startOffsetY + dy, -maxOffsetYRef.current, maxOffsetYRef.current),
       });
-    } else if (pts.length === 2 && pinchBaseRef.current && baseWRef.current !== null) {
+    } else if (pts.length === 2 && pinchBaseRef.current && baseWRef.current !== null && baseHRef.current !== null) {
       const dist = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y) || 1;
       const newScale = clamp(
         (pinchBaseRef.current.startScale * dist) / pinchBaseRef.current.dist,
         1,
         MAX_SCALE,
       );
-      const newMaxOffset = Math.max(0, (baseWRef.current * newScale - widthRef.current) / 2);
+      const newMaxOffsetX = Math.max(0, (baseWRef.current * newScale - widthRef.current) / 2);
+      const newMaxOffsetY = Math.max(0, (baseHRef.current * newScale - heightRef.current) / 2);
       onAdjustRef.current?.({
         scale: newScale,
-        offsetX: clamp(clampedOffsetXRef.current, -newMaxOffset, newMaxOffset),
+        offsetX: clamp(clampedOffsetXRef.current, -newMaxOffsetX, newMaxOffsetX),
+        offsetY: clamp(clampedOffsetYRef.current, -newMaxOffsetY, newMaxOffsetY),
       });
     }
   }
@@ -149,7 +176,10 @@ export default function PhotoOrPlaceholder({
     } else if (pointersRef.current.size === 1) {
       // Second finger lifted — resume single-finger pan from current position
       const [ptr] = pointersRef.current.values();
-      dragBaseRef.current = { startClientX: ptr.x, startOffsetX: clampedOffsetXRef.current };
+      dragBaseRef.current = {
+        startClientX: ptr.x, startOffsetX: clampedOffsetXRef.current,
+        startClientY: ptr.y, startOffsetY: clampedOffsetYRef.current,
+      };
       pinchBaseRef.current = null;
       setIsDragging(true);
     }
@@ -160,7 +190,7 @@ export default function PhotoOrPlaceholder({
   }
 
   const imgLeft = finalW !== null ? (width - finalW) / 2 + clampedOffsetX : 0;
-  const imgTop = finalH !== null ? (height - finalH) / 2 : 0;
+  const imgTop = finalH !== null ? (height - finalH) / 2 + clampedOffsetY : 0;
 
   return (
     <div
@@ -237,7 +267,7 @@ export default function PhotoOrPlaceholder({
             }}
             onAnimationEnd={() => setHintDone(true)}
           >
-            <ChevronsLeftRightEllipsis size={18} />
+            <Move size={18} />
           </div>
         </div>
       )}

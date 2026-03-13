@@ -32,6 +32,7 @@ export type Sticker = {
 
 export type PhotoAdjustment = {
   offsetX: number; // x-axis pan offset (px from center), clamped so image edge doesn't exceed slot
+  offsetY: number; // y-axis pan offset (px from center), clamped so image edge doesn't exceed slot
   scale: number;   // user zoom multiplier on top of cover-scale; 1 = no extra zoom
 };
 
