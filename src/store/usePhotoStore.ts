@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { FilterId, Layout, Sticker, StripConfig } from "@/types";
+import type { FilterId, Layout, PhotoAdjustment, Sticker, StripConfig } from "@/types";
 import { DEFAULT_STRIP_CONFIG, LAYOUTS } from "@/lib/constants";
 
 export type ShootingMode = "camera" | "upload";
@@ -41,6 +41,8 @@ interface PhotoStore {
   updateSticker: (id: string, patch: Partial<Sticker>) => void;
   removeSticker: (id: string) => void;
   setTimestamp: (show: boolean, text?: string) => void;
+  setPhotoAdjustment: (index: number, patch: Partial<PhotoAdjustment>) => void;
+  clearPhotoAdjustments: () => void;
 
   reset: () => void;
 }
@@ -113,6 +115,14 @@ export const usePhotoStore = create<PhotoStore>((set) => ({
         timestampText: text ?? s.stripConfig.timestampText,
       },
     })),
+  setPhotoAdjustment: (index, patch) =>
+    set((s) => {
+      const adjs = [...(s.stripConfig.photoAdjustments ?? [])];
+      adjs[index] = { ...{ offsetX: 0, scale: 1 }, ...adjs[index], ...patch };
+      return { stripConfig: { ...s.stripConfig, photoAdjustments: adjs } };
+    }),
+  clearPhotoAdjustments: () =>
+    set((s) => ({ stripConfig: { ...s.stripConfig, photoAdjustments: [] } })),
 
   reset: () =>
     set({

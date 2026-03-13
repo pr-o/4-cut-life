@@ -83,6 +83,8 @@ function EditContent() {
   const updateSticker = usePhotoStore((s) => s.updateSticker);
   const removeSticker = usePhotoStore((s) => s.removeSticker);
   const setTimestamp = usePhotoStore((s) => s.setTimestamp);
+  const setPhotoAdjustment = usePhotoStore((s) => s.setPhotoAdjustment);
+  const clearPhotoAdjustments = usePhotoStore((s) => s.clearPhotoAdjustments);
   const reset = usePhotoStore((s) => s.reset);
 
   const [activeStickerType, setActiveStickerType] =
@@ -113,6 +115,7 @@ function EditContent() {
       setSelectedPhotos([...selectedPhotos, src]);
     }
   }
+
 
   // Keep stickers visually anchored when dimensions change.
   // Grid expands symmetrically from center, so shift by half the total expansion.
@@ -371,6 +374,7 @@ function EditContent() {
               config={config}
               stripRef={stripRef}
               className="shadow-xl"
+              onAdjustPhoto={!activeStickerType ? setPhotoAdjustment : undefined}
             />
             <StickerOverlay
               stickers={config.stickers}
@@ -452,6 +456,7 @@ function EditContent() {
                 setFilter("none");
                 config.stickers.forEach((s) => removeSticker(s.id));
                 setTimestamp(false, "");
+                clearPhotoAdjustments();
               }}
             >
               Reset to defaults

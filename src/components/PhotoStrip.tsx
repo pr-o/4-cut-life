@@ -1,6 +1,6 @@
 "use client";
 
-import type { Layout, StripConfig } from "@/types";
+import type { Layout, PhotoAdjustment, StripConfig } from "@/types";
 import { APP_TITLE, FILTER_CSS } from "@/lib/constants";
 import { STICKER_COMPONENTS } from "@/components/stickers";
 import PhotoOrPlaceholder from "@/components/PhotoOrPlaceholder";
@@ -11,6 +11,7 @@ type Props = {
   config: StripConfig;
   stripRef?: React.RefObject<HTMLDivElement | null>;
   className?: string;
+  onAdjustPhoto?: (index: number, patch: Partial<PhotoAdjustment>) => void;
 };
 
 export default function PhotoStrip({
@@ -19,6 +20,7 @@ export default function PhotoStrip({
   config,
   stripRef,
   className,
+  onAdjustPhoto,
 }: Props) {
   const { cols, rows, width: layoutWidth, height: photoHeight } = layout;
   const {
@@ -72,6 +74,8 @@ export default function PhotoStrip({
             width={photoWidth}
             height={photoHeight}
             style={{ objectFit: "cover", filter: cssFilter }}
+            adjustment={config.photoAdjustments?.[i]}
+            onAdjust={onAdjustPhoto ? (patch) => onAdjustPhoto(i, patch) : undefined}
           />
         ))}
       </div>
