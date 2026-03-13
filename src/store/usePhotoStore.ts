@@ -118,7 +118,7 @@ export const usePhotoStore = create<PhotoStore>((set) => ({
   setPhotoAdjustment: (index, patch) =>
     set((s) => {
       const adjs = [...(s.stripConfig.photoAdjustments ?? [])];
-      adjs[index] = { ...{ offsetX: 0, scale: 1 }, ...adjs[index], ...patch };
+      adjs[index] = { ...{ offsetX: 0, offsetY: 0, scale: 1 }, ...adjs[index], ...patch };
       return { stripConfig: { ...s.stripConfig, photoAdjustments: adjs } };
     }),
   clearPhotoAdjustments: () =>
