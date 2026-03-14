@@ -187,8 +187,8 @@ function EditContent() {
   function handleStripClick(e: React.MouseEvent<HTMLDivElement>) {
     if (!activeStickerType || !stripRef.current) return;
     const rect = stripRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left - config.frameWidth;
-    const y = e.clientY - rect.top - config.frameWidth;
+    const x = (e.clientX - rect.left) / zoom - config.frameWidth;
+    const y = (e.clientY - rect.top) / zoom - config.frameWidth;
     addSticker({
       id: crypto.randomUUID(),
       type: activeStickerType,
@@ -375,6 +375,7 @@ function EditContent() {
               stickers={config.stickers}
               stripRef={stripRef}
               frameWidth={config.frameWidth}
+              zoom={zoom}
               disabled={!!activeStickerType}
               onMove={(id, x, y) => updateSticker(id, { x, y })}
               onResize={(id, scale) => updateSticker(id, { scale })}
