@@ -11,6 +11,7 @@ type Props = {
   stickers: Sticker[];
   stripRef: React.RefObject<HTMLDivElement | null>;
   frameWidth: number;
+  zoom: number;
   onMove: (id: string, x: number, y: number) => void;
   onResize: (id: string, scale: number) => void;
   disabled: boolean;
@@ -36,6 +37,7 @@ export default function StickerOverlay({
   stickers,
   stripRef,
   frameWidth,
+  zoom,
   onMove,
   onResize,
   disabled,
@@ -44,8 +46,10 @@ export default function StickerOverlay({
 
   const onMoveRef = useRef(onMove);
   const onResizeRef = useRef(onResize);
+  const zoomRef = useRef(zoom);
   useEffect(() => { onMoveRef.current = onMove; }, [onMove]);
   useEffect(() => { onResizeRef.current = onResize; }, [onResize]);
+  useEffect(() => { zoomRef.current = zoom; }, [zoom]);
 
   // Keep selectedId accessible inside document listeners without re-binding them
   const selectedIdRef = useRef<string | null>(null);
@@ -92,8 +96,8 @@ export default function StickerOverlay({
 
       rafRef.current = requestAnimationFrame(() => {
         if (drag) {
-          const dx = clientX - drag.startMouseX;
-          const dy = clientY - drag.startMouseY;
+          const dx = (clientX - drag.startMouseX) / zoomRef.current;
+          const dy = (clientY - drag.startMouseY) / zoomRef.current;
           onMoveRef.current(drag.id, drag.startX + dx, drag.startY + dy);
         }
         if (resize) {
@@ -112,8 +116,10 @@ export default function StickerOverlay({
       resizeRef.current = null;
     }
 
-    function onMouseDown(e: MouseEvent) {
-      if (isOutsideStrip(e.clientX, e.clientY)) setSelectedId(null);
+    function onMouseDown() {
+      // Deselect on any mousedown not on a sticker.
+      // Sticker onMouseDown calls stopPropagation, so this won't fire when clicking a sticker.
+      setSelectedId(null);
     }
 
     document.addEventListener("mousemove", onMouseMove);
@@ -135,8 +141,7 @@ export default function StickerOverlay({
 
   return (
     <div
-      style={{ position: "absolute", inset: 0 }}
-      onClick={() => setSelectedId(null)}
+      style={{ position: "absolute", inset: 0, pointerEvents: "none" }}
     >
       {stickers.map((sticker) => {
         const sizeInPx = BASE_SIZE * sticker.scale;
@@ -154,6 +159,7 @@ export default function StickerOverlay({
               transform: `translate(-50%, -50%) rotate(${sticker.rotate}deg)`,
               cursor: isSelected ? "grab" : "pointer",
               touchAction: "none",
+              pointerEvents: "auto",
             }}
             onClick={(e) => {
               e.stopPropagation();
@@ -206,8 +212,8 @@ export default function StickerOverlay({
                       e.stopPropagation();
                       const rect = stripRef.current?.getBoundingClientRect();
                       if (!rect) return;
-                      const centerX = rect.left + frameWidth + sticker.x;
-                      const centerY = rect.top + frameWidth + sticker.y;
+                      const centerX = rect.left + (frameWidth + sticker.x) * zoom;
+                      const centerY = rect.top + (frameWidth + sticker.y) * zoom;
                       const dist = Math.hypot(e.clientX - centerX, e.clientY - centerY) || 1;
                       resizeRef.current = {
                         id: sticker.id,
