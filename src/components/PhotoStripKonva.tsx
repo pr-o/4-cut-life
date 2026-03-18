@@ -207,6 +207,9 @@ export default function PhotoStripKonva({
     startScale: number;
   } | null>(null);
 
+  // ── Photo drag cursor ────────────────────────────────────────────────────
+  const [isDraggingPhoto, setIsDraggingPhoto] = useState(false);
+
   // ── Pan hint (shown once per slot when image is loaded and pannable) ────
   const [hintDone, setHintDone] = useState<Set<number>>(new Set());
 
@@ -255,6 +258,7 @@ export default function PhotoStripKonva({
 
   function handleStageMouseUp() {
     photoDragRef.current = null;
+    setIsDraggingPhoto(false);
   }
 
   function handleStageClick(e: Konva.KonvaEventObject<MouseEvent>) {
@@ -278,7 +282,7 @@ export default function PhotoStripKonva({
         onMouseUp={handleStageMouseUp}
         onClick={handleStageClick}
         onMouseDown={handleStageMouseDown}
-        style={{ cursor: isPlacingSticker ? "none" : "default" }}
+        style={{ cursor: isPlacingSticker ? "none" : isDraggingPhoto ? "move" : "default" }}
       >
         <Layer>
           {/* Frame background */}
@@ -327,6 +331,7 @@ export default function PhotoStripKonva({
                     e.cancelBubble = true;
                     const pos = e.target.getStage()?.getPointerPosition();
                     if (!pos) return;
+                    setIsDraggingPhoto(true);
                     photoDragRef.current = {
                       index: i,
                       startStageX: pos.x,
