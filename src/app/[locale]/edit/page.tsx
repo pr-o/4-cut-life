@@ -14,8 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import NavigationGuard from "@/components/NavigationGuard";
-import PhotoStrip from "@/components/PhotoStrip";
-import StickerOverlay from "@/components/StickerOverlay";
+import PhotoStripKonva from "@/components/PhotoStripKonva";
 import SectionLabel from "@/components/SectionLabel";
 import SliderControl from "@/components/SliderControl";
 import SelectOptionButton from "@/components/SelectOptionButton";
@@ -37,10 +36,10 @@ import {
 } from "@/lib/constants";
 import { STICKER_COMPONENTS } from "@/components/stickers";
 import {
-  exportStripPng,
   downloadDataUrl,
   compressToTarget,
 } from "@/lib/export/toPng";
+import { EXPORT_PIXEL_RATIO } from "@/lib/constants";
 import { isMobile } from "@/lib/export/utils";
 import { exportStripGif } from "@/lib/export/toGif";
 import type { FilterId, StickerType } from "@/types";
@@ -67,7 +66,7 @@ const FRAME_COLORS = [
 function EditContent() {
   const t = useTranslations("edit");
   const router = useRouter();
-  const stripRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<import("konva/lib/Stage").Stage>(null);
   const stripWrapperRef = useRef<HTMLDivElement>(null);
   const stickerPickerRef = useRef<HTMLDivElement>(null);
 
@@ -184,16 +183,13 @@ function EditContent() {
     return () => document.removeEventListener("click", onClick);
   }, [activeStickerType]);
 
-  function handleStripClick(e: React.MouseEvent<HTMLDivElement>) {
-    if (!activeStickerType || !stripRef.current) return;
-    const rect = stripRef.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / zoom - config.frameWidth;
-    const y = (e.clientY - rect.top) / zoom - config.frameWidth;
+  function handleStickerPlace(stageX: number, stageY: number) {
+    if (!activeStickerType) return;
     addSticker({
       id: crypto.randomUUID(),
       type: activeStickerType,
-      x,
-      y,
+      x: stageX - config.frameWidth,
+      y: stageY - config.frameWidth,
       scale: 1,
       rotate: Math.round(Math.random() * 30 - 15),
     });
@@ -201,7 +197,9 @@ function EditContent() {
   }
 
   async function getPngDataUrl(): Promise<string> {
-    return exportStripPng(stripRef.current!);
+    const stage = stageRef.current;
+    if (!stage) throw new Error("No stage ref");
+    return stage.toDataURL({ pixelRatio: EXPORT_PIXEL_RATIO });
   }
 
   async function handleDownloadPng() {
@@ -353,32 +351,22 @@ function EditContent() {
         <div className="flex-1 flex items-start justify-center p-8 bg-[#eee] relative overflow-auto">
           <div
             ref={stripWrapperRef}
-            onClick={handleStripClick}
             style={{
               position: "relative",
-              cursor: activeStickerType ? "none" : "default",
               transform: `scale(${zoom})`,
               transformOrigin: "top center",
             }}
           >
-            <PhotoStrip
+            <PhotoStripKonva
               photos={photosForStrip}
               layout={layout}
               config={config}
-              stripRef={stripRef}
+              stageRef={stageRef}
               className="shadow-xl"
-              onAdjustPhoto={
-                !activeStickerType ? setPhotoAdjustment : undefined
-              }
-            />
-            <StickerOverlay
-              stickers={config.stickers}
-              stripRef={stripRef}
-              frameWidth={config.frameWidth}
-              zoom={zoom}
-              disabled={!!activeStickerType}
-              onMove={(id, x, y) => updateSticker(id, { x, y })}
-              onResize={(id, scale) => updateSticker(id, { scale })}
+              onAdjustPhoto={!activeStickerType ? setPhotoAdjustment : undefined}
+              onMoveSticker={(id, x, y) => updateSticker(id, { x, y })}
+              onResizeSticker={(id, scale, rotate) => updateSticker(id, { scale, rotate })}
+              onStageClick={activeStickerType ? handleStickerPlace : undefined}
             />
           </div>
 

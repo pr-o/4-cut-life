@@ -42,17 +42,17 @@ function UploadContent() {
 
   const slotCount = layout.cols * layout.rows;
   const [photos, setPhotos] = useState<string[]>([]);
-  const [error, setError] = useState<string | null>(null);
+
+  const remaining = Math.max(0, slotCount - photos.length);
+  const hasEnough = photos.length >= slotCount;
 
   async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
-    if (files.length < slotCount) {
-      setError(t("minPhotosError", { slotCount, cols: layout.cols, rows: layout.rows }));
-      return;
-    }
-    setError(null);
+    if (files.length === 0) return;
+    // Reset so the same file(s) can be picked again in a subsequent upload
+    e.target.value = "";
     const urls = await Promise.all(files.map(resizeToDataUrl));
-    setPhotos(urls);
+    setPhotos((prev) => [...prev, ...urls]);
   }
 
   function handleContinue() {
@@ -88,6 +88,9 @@ function UploadContent() {
             ? t("photosSelectedOne", { count: photos.length })
             : t("photosSelectedMany", { count: photos.length })
           : t("choosePhotos")}
+        {photos.length > 0 && (
+          <span className="text-xs opacity-60">{t("addMorePhotos")}</span>
+        )}
         <input
           type="file"
           accept="image/*"
@@ -97,7 +100,13 @@ function UploadContent() {
         />
       </label>
 
-      {error && <p className="text-sm text-destructive">{error}</p>}
+      {photos.length > 0 && !hasEnough && (
+        <p className="text-sm text-destructive">
+          {remaining === 1
+            ? t("minPhotosError", { remaining })
+            : t("minPhotosErrorPlural", { remaining })}
+        </p>
+      )}
 
       <PhotoThumbnailGrid
         photos={photos}
@@ -105,7 +114,7 @@ function UploadContent() {
         size={96}
       />
 
-      {photos.length >= slotCount && (
+      {hasEnough && (
         <p className="text-xs text-muted-foreground text-center max-w-xs leading-relaxed">
           {t.rich("adjustTip", {
             strong: (chunks) => <strong className="text-foreground">{chunks}</strong>,
@@ -115,7 +124,7 @@ function UploadContent() {
 
       <div className="flex gap-3">
         <GoBackButton href={ROUTES.modeSelect} />
-        {photos.length >= slotCount && (
+        {hasEnough && (
           <Button size="lg" className="px-12" onClick={handleContinue}>
             {t("continue")}
           </Button>
